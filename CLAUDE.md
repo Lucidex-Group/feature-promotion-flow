@@ -6,6 +6,7 @@ This project holds the guide to Feature Promotion Flow, which is one web page bu
 
 - **The project uses Feature Promotion Flow, on its own, without Docket.** Load the `feature-promotion-flow` skill before any Git command that changes anything, and the `fpf-` skill for the step in hand. The skills are in `plugin/skills/`.
 - `main`, `development` and `stage` change only by pull request, merged as real merges. The repository allows merge commits only.
+- **GitHub enforces it with two rulesets.** `main`: no deletion, no force push, changes only by pull request, merged as a merge commit; no one may bypass it. `development` and `stage`: no deletion, changes only by pull request, merged as a merge commit; the repository's admins may bypass it, so that they can reset either to `main`.
 - The project gives its work no ids, so a branch is named `<kind>/<a few words>`, and its folder is `~/Development/worktrees/feature-promotion-flow/<kind>-<a few words>`.
 - **The project's whole suite** is `python3 tools/test.py`. It builds the site and checks that the page has no place named twice and no link that leads nowhere, and it checks the skills package: that it is a valid plugin, that every skill loads, that nothing in it leans on anything only its authors have, and that the zip can be made.
 - **Where the work is kept.** What is to be built is written as an issue on GitHub, with its scenarios where it is new behaviour. A code review is reported on the feature's pull request into `development`. QA's report and the maintainer's acceptance are written on the pull request that promotes `stage` to `main`.
@@ -17,6 +18,7 @@ This project holds the guide to Feature Promotion Flow, which is one web page bu
 - `site/source/flow.py` is the first tab: the flow on its own. `site/source/docket.py` is the second: the flow in a project on Docket, whose words and figures are those of the guide kept with Docket. `drawing.py` draws the figures, and `shared.py` holds the figures and tables that read the same in both tabs. `figures.css` and `figures.js` are the guide's own styles and script; `shell.css` and `shell.js` are the header, the two tabs and the contents on the left.
 - The two tabs follow each other section by section, and a section has the same name in both, so a reader can switch tabs and stay in the same place.
 - `plugin/` is the skills package, a Claude Code plugin, and `.claude-plugin/marketplace.json` makes the repository its marketplace. `tools/package.py` writes the package as a zip. The plugin's version, in `plugin/.claude-plugin/plugin.json`, moves with each release that changes the package.
+- `.github/workflows/pages.yml` publishes `site/` to GitHub Pages, at https://lucidex-group.github.io/feature-promotion-flow/, each time `main` changes. It first checks that the committed `site/index.html` is the page the sources build, and publishes nothing if it is not.
 
 ## The rules are not changed here
 

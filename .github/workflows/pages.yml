@@ -1,0 +1,36 @@
+# Publishes the guide, site/, to GitHub Pages each time main changes. main changes only when a release is promoted,
+# so the published guide is always the latest release.
+name: Publish the guide
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check that the committed page is the one the sources build
+        run: |
+          python3 site/source/build.py
+          git diff --exit-code -- site/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
