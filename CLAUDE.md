@@ -14,8 +14,9 @@ This project holds the guide to Feature Promotion Flow, which is one web page bu
 ## What is where
 
 - `site/index.html` is the guide. It is built; do not edit it by hand. Build it with `python3 site/source/build.py`.
-- `site/source/flow.py` is the first tab: the flow on its own. `site/source/docket.py` is the second: the flow in a project on Docket, whose words and figures are those of the guide kept with Docket. `drawing.py` draws the figures, and `shared.py` holds the figures and tables that read the same in both tabs. `figures.css` and `figures.js` are the guide's own styles and script; `shell.css` and `shell.js` are the header, the two tabs and the contents on the left.
-- The two tabs follow each other section by section, and a section has the same name in both, so a reader can switch tabs and stay in the same place.
+- `site/source/flow.py` is the first tab: the flow on its own. `site/source/docket.py` is the second: the flow in a project on Docket, whose words and figures are those of the guide kept with Docket. `site/source/docket_app.py` is the third: Docket itself, the application, with screenshots in `site/images/docket/`. `drawing.py` draws the figures, and `shared.py` holds the figures and tables that read the same in the first two tabs. `figures.css` and `figures.js` are the guide's own styles and script; `shell.css` and `shell.js` are the header, the three tabs and the contents on the left.
+- The first two tabs follow each other section by section, and a section has the same name in both, so a reader can switch tabs and stay in the same place. The third has sections of its own; switching to or from it goes to the same place where there is one, and otherwise to the overview.
+- The screenshots in the third tab are of Docket built from its development branch, serving a made-up project written for the guide, never a real project's record. Each page is reached by clicking through the app, as a person would, not by typing an address. Retake them when Docket's pages change.
 - `plugin/` is the skills package, a Claude Code plugin, and `.claude-plugin/marketplace.json` makes the repository its marketplace. `tools/package.py` writes the package as a zip. The plugin's version, in `plugin/.claude-plugin/plugin.json`, moves with each release that changes the package.
 
 ## The rules are not changed here

@@ -41,7 +41,11 @@ def the_site_builds():
     nowhere = sorted(set(re.findall(r' href="#([\w-]+)"', page)) - set(ids))
     if twice:
         return 'places named twice: ' + ', '.join(twice)
-    return 'links that lead nowhere: ' + ', '.join(nowhere) if nowhere else ''
+    if nowhere:
+        return 'links that lead nowhere: ' + ', '.join(nowhere)
+    files = sorted(set(re.findall(r' (?:src|href)="(images/[^"]+)"', page)))
+    missing = [f for f in files if not os.path.isfile(os.path.join(ROOT, 'site', f))]
+    return 'images the page names that are not there: ' + ', '.join(missing) if missing else ''
 
 
 def the_plugin_is_valid():
@@ -96,7 +100,7 @@ def a_zip_can_be_made():
         return 'the unpacked zip is not a valid plugin' if done.returncode else ''
 
 
-check('The site builds, with no place named twice and no link that leads nowhere', the_site_builds())
+check('The site builds, with no place named twice, no link that leads nowhere and no image missing', the_site_builds())
 check('The package is a valid plugin, and the repository a valid marketplace', the_plugin_is_valid())
 check('Every skill loads: a name matching its folder and a description that says when to use it', every_skill_loads())
 check('The package stands alone: no private reference, and every file it points to is inside it', the_package_stands_alone())
