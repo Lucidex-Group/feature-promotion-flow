@@ -90,6 +90,10 @@ def doc():
              '<p class="say">A use case, opened in the Work table the same way, holds the goal, its flows, and the stories sliced from each flow.</p>'
              + shot('use-case', 'A use case opened in Docket\'s Work table, Borrow a book: its actors and state, its text with the main flow, and its flows with their stories and where each stands.',
                     '<b>A use case.</b> Its primary and supporting actors, its state, who wrote it, its text, and below, each flow with the stories sliced from it and where each stands: "Borrow a book on the shelf" is delivered and proven; "Reserve a book that is out" is in progress.')),
+            ('decisions', 'Decisions',
+             '<p class="say">The Decisions page lists the project\'s design decisions, each with whether it is in force, proposed, decided against or replaced. It reads them from the project\'s own numbered decision files, and an agent is given those that bear on its work when it asks for its brief.</p>'
+             + shot('decisions', 'Docket\'s Decisions page for the made-up lending library: two decisions in force and one decided against, each with its number and state.',
+                    '<b>The decisions.</b> Each numbered decision file, with its title and its state as the project wrote it: keeping one catalogue for every branch library and identifying members by card number are in force; charging late fines was decided against. Choose a row to read the decision. Smaller decisions about a story are kept beside it in the Work table.')),
             ('environments', 'Where work is',
              '<p class="say">The Environments page shows what each branch carries, read from the merges each time.</p>'
              + shot('environments', 'Docket\'s Environments page: Development carries Reservations and Borrowing at the desk; Stage carries Borrowing at the desk; Released below.',
