@@ -64,7 +64,7 @@ def doc():
                    'No real project\'s record is shown. Choose a screenshot to open it full size.</p>')
     parts = [
         ('What Docket is', 'For a person deciding whether to put a project on Docket.', [
-            ('about', 'What Docket is',
+            ('docket', 'What Docket is',
              '<p class="say">Docket is a program that keeps a record of everything a software project creates, in the project\'s own repository, for people and agents to work through: use cases, stories, scenarios, work items, decisions, and the evidence of what was done and tested.</p>'
              '<p class="note">It is a ticket tracker whose tickets are files in the repository. It was built to run Feature Promotion Flow, and the second tab of this guide describes the flow as a project on Docket runs it.</p>'
              + pages_intro + shot('work', 'Docket\'s Work page for the made-up lending library: use cases, stories, decisions and work items in one table, with status and estimates.',

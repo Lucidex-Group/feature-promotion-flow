@@ -52,10 +52,14 @@ def switching_tabs_leads_where_it_should():
     """The tab rules in site/source/tabs.js, run with Node against the places in the built page."""
     page = open(os.path.join(ROOT, 'site', 'index.html')).read()
     ids = re.findall(r' id="([\w-]+)"', page)
-    shared = sorted({i[2:] for i in ids if i.startswith('a-')} & ({i for i in ids if not i.startswith(('a-', 'd-'))} | {i[2:] for i in ids if i.startswith('d-')})
+    # A section of the third tab may share its place name with one in the other tabs only where it shares its title too,
+    # because switching tabs goes to the section of the same place name.
+    titles = dict(re.findall(r' id="([\w-]+)"><header>(?:<span class="num">\d+</span>)?<h2>(.*?)</h2>', page))
+    shared = sorted(k for k in ({i[2:] for i in ids if i.startswith('a-')} & ({i for i in ids if not i.startswith(('a-', 'd-'))} | {i[2:] for i in ids if i.startswith('d-')})
                     - {'overview'} - {i for i in ids if re.fullmatch(r'part-\d+', i)})
+                    if titles.get('a-' + k) not in {titles.get(k), titles.get('d-' + k)})
     if shared:
-        return 'the Docket tab has sections named as in the other tabs, so switching would land on an unrelated one: ' + ', '.join(shared)
+        return 'the Docket tab has sections named as in the other tabs but titled differently, so switching would land on an unrelated one: ' + ', '.join(shared)
     # Each case: the place the reader is at, its part, and where each of the three tabs should then lead.
     cases = [
         ('', 'overview', 'part-1', ['overview', 'd-overview', 'a-overview']),
@@ -65,6 +69,8 @@ def switching_tabs_leads_where_it_should():
         ('d-adds', 'adds', 'part-1', ['part-1', 'd-adds', 'a-overview']),
         ('a-releases', 'releases', 'part-2', ['overview', 'd-overview', 'a-releases']),
         ('a-part-3', 'part-3', 'part-3', ['overview', 'd-overview', 'a-part-3']),
+        ('d-docket', 'docket', 'part-1', ['part-1', 'd-docket', 'a-docket']),
+        ('a-docket', 'docket', 'part-1', ['overview', 'd-docket', 'a-docket']),
     ]
     script = ("const T = require(process.argv[1]); const ids = new Set(JSON.parse(process.argv[2])); const cases = JSON.parse(process.argv[3]);"
               "const out = cases.map(([id, key, part]) => { const p = T.parts(id); return [p.doc, p.key, ['flow', 'docket', 'app'].map(t => T.target(t, p.doc, key, part, x => ids.has(x)))]; });"
