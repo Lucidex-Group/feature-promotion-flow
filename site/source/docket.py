@@ -926,41 +926,6 @@ PART1 = [
 ]
 
 
-# What Docket is, and how it works: written for this site, as Docket stood on November 22, 2026.
-DOES = [
-    ('It keeps the backlog', 'Use cases and their flows, the stories sliced from them, the work items that deliver each story, and the scenarios each one has to meet. Each item carries its status, its order and who it is assigned to.'),
-    ('It keeps the decisions and the evidence', 'Decisions are kept in the words of whoever made them, beside the thing they are about. Estimates, attempts, test runs and code reviews are kept on the work item they belong to.'),
-    ('It shows where work stands', 'Where each work item is, on development, stage or main, is read from the merges of the branch named for it. It is not a status someone sets.'),
-    ('It serves a person and an agent the same record', 'Web pages for a person, and a connection for an agent (the Model Context Protocol). Both call the same code, and an agent is told the rules of the flow when it connects.'),
-    ('It checks the record', 'docket check reports slips against the flow. docket assess says what adopting a project would involve, and changes nothing.'),
-    ('It reports', 'On delivery, quality, agents, effort and coverage, read out of the record. The reports are partly built.'),
-]
-WORKS = [
-    ('One program, run on your own machine', 'Docket is installed apart from the projects it serves, and puts nothing of its own into them: no packages, no database, no plugin. docket serve, started in any folder of a project, serves that project on its own port, on the local machine only. One server is one project.'),
-    ('The record is files, and there is no database', 'The record is files under .docket/ and features/, with the project\'s own documents. Everything Docket shows is read from those files and from Git on each request.'),
-    ('It writes files and does not commit', 'Docket never stages, commits or pushes, and runs no Git command that changes a repository. It refuses a write based on a file that has changed since it was read. Whoever did the work commits it.'),
-    ('It reads Git', 'Who the people are, from the authors of commits. Whether a record file is committed and pushed. And where a work item is, from the titles of the merges on development, stage and main.'),
-    ('It is served from the record\'s folder', 'The record has a permanent branch, docket-record, checked out in a folder of its own. Docket reads and writes only that folder, so it always shows one record.'),
-    ('The server keeps the time', 'Every call is stamped by the server when it arrives, so the times in the record do not rest on an agent\'s say-so.'),
-]
-
-
-def about():
-    def cards(rows):
-        return ''.join(f'<li><h3>{esc(t)}</h3><p>{esc(d)}</p></li>' for t, d in rows)
-    return ('<p class="say">Docket is a program that keeps a record of everything a software project creates, in the project\'s own repository, for people and agents to work through: use cases, stories, scenarios, work items, decisions, and the evidence of what was done and tested.</p>'
-            '<p class="note">It is a ticket tracker whose tickets are files in the repository. It was built to run Feature Promotion Flow, and the rest of this guide describes the flow as a project on Docket runs it.</p>'
-            '<h3 class="sub">What it does</h3>'
-            f'<ul class="gives">{cards(DOES)}</ul>'
-            '<h3 class="sub">How it works</h3>'
-            f'<ul class="gives two">{cards(WORKS)}</ul>'
-            '<h3 class="sub">Its pages</h3>'
-            '<p class="note">The pages follow the life of the work. <b>Define:</b> Principles and Decisions. <b>Do:</b> Work, the backlog as one table of use cases, stories and work items, with what needs attention. <b>Deliver:</b> Environments, History and Reports. <b>Project:</b> Artifacts, Participants, Record health, and this guide.</p>'
-            '<h3 class="sub">What it is not</h3>'
-            '<p class="note">Docket is not a hosted service. It has no sign-in and no database shared between users, and it does not deploy anything. It is in active development and is not yet in production. A project on Docket can be worked on without it, because every step is plain Git and the record is plain files.</p>'
-            '<p class="note"><b>The repository.</b> Docket is not yet published. Its repository will be linked here when it is.</p>')
-
-
 PARTS = [
     ('Docket, and what a project on it has to be', 'For a person deciding whether to put a project on Docket, and anyone working in one that is on it.'),
     ('Why', 'For anyone deciding whether to work this way.'),
@@ -1067,7 +1032,7 @@ def doc():
         'intro': 'A project\'s record is its use cases, stories, scenarios, work items and decisions, kept as files in the repository on a branch of their own. Every feature lives on its own branch, cut from that record. Features are merged into <code>development</code> to be tested together. A release is assembled on <code>stage</code> from the features chosen for it, verified, and promoted to <code>main</code>. The record travels with the code the whole way, so a build carries its own work items.',
         'parts': PARTS,
         'first': [{'id': i, 'title': t, 'html': f'<section id="{i}"><header><h2>{t}</h2></header>{b.replace('#s10', '#holds')}</section>'}
-                  for i, t, b in [('docket', 'What Docket is, and how it works', about())] + PART1],
+                  for i, t, b in [('docket', 'What Docket is', '<p class="say">What Docket is, what it does, what its pages look like and how it runs the flow are in the third tab, <a href="#a-overview">Docket</a>. This tab is the flow as a project on Docket runs it.</p>')] + PART1],
         'repo': ('', '', 'Docket is not yet published. Its repository will be linked here when it is.'),
         'why': {'id': 'why', 'title': 'Why it exists, and why the record has its own branch', 'html': purpose()},
         'legend': f'<div class="top legend"><h3 class="sub">The branches, and how to read the figures</h3><ul class="branches">{br}</ul>{KEY}{who3()}</div>',

@@ -6,7 +6,7 @@ This repository holds the guide to the method and a package of skills for an age
 
 ## The guide
 
-`site/index.html` is the guide: one web page with two tabs. The first is the flow on its own. The second is the flow in a project that keeps its record with Docket, a program from Lucidex Group that is not yet published. Open the file in a browser. Nothing has to be installed; the page loads its fonts from Google Fonts, and falls back to the system's own where it cannot.
+`site/index.html` is the guide: one web page with three tabs. The first is the flow on its own. The second is the flow in a project that keeps its record with Docket, a program from Lucidex Group that is not yet published. The third is Docket itself: what it does, its pages in screenshots, and how it runs the flow. Open the file in a browser; the screenshots are in `site/images/docket/` beside it. Nothing has to be installed; the page loads its fonts from Google Fonts, and falls back to the system's own where it cannot.
 
 The page is built from the files in `site/source/`:
 
