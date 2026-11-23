@@ -1,4 +1,4 @@
-// The three tabs and the contents: one guide is shown at a time, one part of it to a page.
+// The four tabs and the contents: one guide is shown at a time, one part of it to a page.
 // How places are named in each guide, and where each tab leads, is in tabs.js.
 (function () {
   var all = function (sel, root) { return [].slice.call((root || document).querySelectorAll(sel)); };

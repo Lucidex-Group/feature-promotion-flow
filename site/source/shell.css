@@ -145,3 +145,21 @@ padding:20px 12px 20px max(12px,env(safe-area-inset-left,0px));background:var(--
 .gdoc[data-doc="app"] .gives li{min-width:0}
 .gdoc[data-doc="app"] .gives code{white-space:normal;overflow-wrap:anywhere}
 .gdoc .shotnote{padding:12px 16px;border-left:2px solid var(--brand);background:var(--panel);border-radius:0 var(--rx) var(--rx) 0}
+
+/* The Skills tab: a skill's outline, the commands that install them, and each skill's whole text, folded. */
+.gdoc table.skilltable{min-width:0}
+.gdoc table.skilltable td:first-child{white-space:nowrap}
+.gdoc h3.sk{margin:22px 0 6px;font:500 11px var(--head);letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.gdoc ol.outline{margin:0;padding-left:22px;line-height:1.55}
+.gdoc ol.outline>li{margin:4px 0}
+.gdoc ol.outline ol{margin:4px 0 8px;padding-left:20px;color:var(--muted);font-size:14.5px}
+.gdoc pre.cmd,.gdoc .skilltext pre{margin:10px 0;padding:12px 14px;border-radius:var(--rc);background:var(--raised);border:1px solid var(--hair);font:12.5px/1.6 var(--mono);color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.gdoc .skilltext{margin-top:20px;border:1px solid var(--border);border-radius:var(--r);background:var(--panel);padding:0 16px}
+.gdoc .skilltext summary{cursor:pointer;padding:12px 0;font-weight:500;color:var(--text)}
+.gdoc .skilltext summary:hover{color:var(--accent)}
+.gdoc .skilltext[open]{padding-bottom:6px}
+.gdoc .skilltext pre{max-height:70vh;overflow:auto;font-size:12px}
+@media (max-width:520px){.gdoc table.skilltable td:first-child{white-space:normal;overflow-wrap:anywhere}}
+.gdoc .skilltext code,.gdoc[data-doc="skills"] .note code{white-space:normal;overflow-wrap:anywhere}
+.gdoc p.skillname{margin:-4px 0 12px;font-size:13px;color:var(--muted)}
+.gdoc .skilltext p.muted a{color:var(--accent)}

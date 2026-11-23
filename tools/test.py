@@ -52,28 +52,32 @@ def switching_tabs_leads_where_it_should():
     """The tab rules in site/source/tabs.js, run with Node against the places in the built page."""
     page = open(os.path.join(ROOT, 'site', 'index.html')).read()
     ids = re.findall(r' id="([\w-]+)"', page)
-    # A section of the third tab may share its place name with one in the other tabs only where it shares its title too,
-    # because switching tabs goes to the section of the same place name.
+    # A section of the Skills or Docket tab may share its place name with one in another tab only where it shares its title
+    # too, because switching tabs goes to the section of the same place name.
     titles = dict(re.findall(r' id="([\w-]+)"><header>(?:<span class="num">\d+</span>)?<h2>(.*?)</h2>', page))
-    shared = sorted(k for k in ({i[2:] for i in ids if i.startswith('a-')} & ({i for i in ids if not i.startswith(('a-', 'd-'))} | {i[2:] for i in ids if i.startswith('d-')})
-                    - {'overview'} - {i for i in ids if re.fullmatch(r'part-\d+', i)})
-                    if titles.get('a-' + k) not in {titles.get(k), titles.get('d-' + k)})
+    tabs = {'': {i for i in ids if not re.match(r'[das]-', i)}, 'd-': {i[2:] for i in ids if i.startswith('d-')},
+            's-': {i[2:] for i in ids if i.startswith('s-')}, 'a-': {i[2:] for i in ids if i.startswith('a-')}}
+    common = {'overview'} | {i for i in ids if re.fullmatch(r'part-\d+', i)}
+    shared = sorted({f'{p}{k}' for p in ('s-', 'a-') for q in tabs if q != p and not (p == 'a-' and q == 's-')
+                     for k in (tabs[p] & tabs[q]) - common if titles.get(p + k) != titles.get(q + k)})
     if shared:
-        return 'the Docket tab has sections named as in the other tabs but titled differently, so switching would land on an unrelated one: ' + ', '.join(shared)
+        return 'the Skills or Docket tab has sections named as in another tab but titled differently, so switching would land on an unrelated one: ' + ', '.join(shared)
     # Each case: the place the reader is at, its part, and where each of the three tabs should then lead.
     cases = [
-        ('', 'overview', 'part-1', ['overview', 'd-overview', 'a-overview']),
-        ('road', 'road', 'part-3', ['road', 'd-road', 'a-overview']),
-        ('d-why', 'why', 'part-2', ['why', 'd-why', 'a-overview']),
-        ('part-2', 'part-2', 'part-2', ['part-2', 'd-part-2', 'a-overview']),
-        ('d-adds', 'adds', 'part-1', ['part-1', 'd-adds', 'a-overview']),
-        ('a-releases', 'releases', 'part-2', ['overview', 'd-overview', 'a-releases']),
-        ('a-part-3', 'part-3', 'part-3', ['overview', 'd-overview', 'a-part-3']),
-        ('d-docket', 'docket', 'part-1', ['part-1', 'd-docket', 'a-docket']),
-        ('a-docket', 'docket', 'part-1', ['overview', 'd-docket', 'a-docket']),
+        ('', 'overview', 'part-1', ['overview', 's-overview', 'd-overview', 'a-overview']),
+        ('road', 'road', 'part-3', ['road', 's-overview', 'd-road', 'a-overview']),
+        ('d-why', 'why', 'part-2', ['why', 's-overview', 'd-why', 'a-overview']),
+        ('part-2', 'part-2', 'part-2', ['part-2', 's-overview', 'd-part-2', 'a-overview']),
+        ('d-adds', 'adds', 'part-1', ['part-1', 's-overview', 'd-adds', 'a-overview']),
+        ('a-releases', 'releases', 'part-2', ['overview', 's-overview', 'd-overview', 'a-releases']),
+        ('a-part-3', 'part-3', 'part-3', ['overview', 's-overview', 'd-overview', 'a-part-3']),
+        ('d-docket', 'docket', 'part-1', ['part-1', 's-overview', 'd-docket', 'a-docket']),
+        ('a-docket', 'docket', 'part-1', ['overview', 's-overview', 'd-docket', 'a-docket']),
+        ('s-install', 'install', 'part-1', ['overview', 's-install', 'd-overview', 'a-overview']),
+        ('s-part-3', 'part-3', 'part-3', ['overview', 's-part-3', 'd-overview', 'a-overview']),
     ]
     script = ("const T = require(process.argv[1]); const ids = new Set(JSON.parse(process.argv[2])); const cases = JSON.parse(process.argv[3]);"
-              "const out = cases.map(([id, key, part]) => { const p = T.parts(id); return [p.doc, p.key, ['flow', 'docket', 'app'].map(t => T.target(t, p.doc, key, part, x => ids.has(x)))]; });"
+              "const out = cases.map(([id, key, part]) => { const p = T.parts(id); return [p.doc, p.key, ['flow', 'skills', 'docket', 'app'].map(t => T.target(t, p.doc, key, part, x => ids.has(x)))]; });"
               "console.log(JSON.stringify(out));")
     import json
     done = run('node', '-e', script, os.path.join(ROOT, 'site', 'source', 'tabs.js'), json.dumps(ids), json.dumps(cases))
