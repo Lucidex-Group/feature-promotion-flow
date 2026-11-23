@@ -1,19 +1,20 @@
-"""Build the Feature Promotion Flow site: one page, three tabs.
+"""Build the Feature Promotion Flow site: one page, four tabs.
 
     python3 build.py                 writes ../index.html, a whole page
     python3 build.py --body <file>   also writes the page without its document tags, for a host that supplies its own
 
-The first tab is the flow on its own (flow.py). The second is the flow in a project on Docket (docket.py). The third is
-Docket itself, the application (docket_app.py), with screenshots from site/images/docket/. Each is laid out the same way:
-the contents on the left, and a page for each part, the first page being the overview with the first part below it.
-The first two follow each other section by section; the third has sections of its own.
+The tabs, in order: the flow on its own (flow.py); the skills delivered with it (skills.py), read from plugin/skills/; the
+flow in a project on Docket (docket.py); and Docket itself, the application (docket_app.py), with screenshots from
+site/images/docket/. Each is laid out the same way: the contents on the left, and a page for each part, the first page
+being the overview with the first part below it. The two guides to the flow follow each other section by section; the
+Skills and Docket tabs have sections of their own.
 """
 import os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-import docket, docket_app, flow  # noqa: E402
+import docket, docket_app, flow, skills  # noqa: E402
 from drawing import esc  # noqa: E402
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -31,7 +32,7 @@ def place(html, prefix):
     """Name every place in one guide's pages with that guide's prefix, and make every link inside it lead there."""
     html = re.sub(r' data-go="[^"]*"', '', html)
     html = re.sub(r' id="([\w-]+)"', lambda m: f' id="{prefix}{m.group(1)}"', html)
-    return re.sub(r' href="#([\w-]+)"', lambda m: f' href="#{m.group(1)}" data-go="{m.group(1)}"' if re.match(r'(d|a)-', m.group(1)) and prefix != m.group(1)[:2]
+    return re.sub(r' href="#([\w-]+)"', lambda m: f' href="#{m.group(1)}" data-go="{m.group(1)}"' if re.match(r'(d|a|s)-', m.group(1)) and prefix != m.group(1)[:2]
                   else f' href="#{prefix}{m.group(1)}" data-go="{prefix}{m.group(1)}"', html)
 
 
@@ -91,8 +92,8 @@ def guide(key, prefix, d):
             place(f'<div class="gdoc" data-doc="{key}"{hidden}>{"".join(pages)}</div>', prefix))
 
 
-def app_guide(prefix, d):
-    """The third tab: the overview with the first part below it, then a page to each later part, with its own contents tree."""
+def app_guide(key, prefix, d):
+    """A tab with parts of its own (Skills, Docket): the overview with the first part below it, then a page to each later part, with its own contents tree."""
     views = [(f'part-{i}', t, f'Part {i}') for i, (t, _, _) in enumerate(d['parts'], 1)]
     cards = ''.join(f'<li><a href="#{v}"><span>{label}</span><b>{esc(title)}</b></a></li>' for v, title, label in views)
     home = (f'<div class="home" id="overview"><header class="page-head"><h1>{esc(d["title"])}</h1>'
@@ -111,15 +112,14 @@ def app_guide(prefix, d):
             pages.append(f'<div class="view" id="part-{i}" data-view="part-{i}" hidden>{head}{body}{nav}</div>')
         subs = ''.join(f'<li><a href="#{sid}">{esc(t)}</a></li>' for sid, t, _ in secs)
         tree.append(f'<details data-part="part-{i}"{" open" if i == 1 else ""}><summary><a href="#part-{i}"><span>Part {i}</span>{esc(title)}</a></summary><ol>{subs}</ol></details>')
-    return (place(f'<div class="gtree" data-doc="app" hidden>{"".join(tree)}</div>', prefix),
-            place(f'<div class="gdoc" data-doc="app" hidden>{"".join(pages)}</div>', prefix))
+    return (place(f'<div class="gtree" data-doc="{key}" hidden>{"".join(tree)}</div>', prefix),
+            place(f'<div class="gdoc" data-doc="{key}" hidden>{"".join(pages)}</div>', prefix))
 
 
 def body():
-    guides = [('flow', '', flow.doc()), ('docket', 'd-', docket.doc())]
-    built = [guide(k, p, d) for k, p, d in guides]
-    guides.append(('app', 'a-', {'title': 'Docket'}))
-    built.append(app_guide('a-', docket_app.doc()))
+    flow_doc, docket_doc = flow.doc(), docket.doc()
+    guides = [('flow', '', flow_doc), ('skills', 's-', {'title': 'Skills'}), ('docket', 'd-', docket_doc), ('app', 'a-', {'title': 'Docket'})]
+    built = [guide('flow', '', flow_doc), app_guide('skills', 's-', skills.doc()), guide('docket', 'd-', docket_doc), app_guide('app', 'a-', docket_app.doc())]
     tabs = ''.join(f'<a href="#{p}overview" data-go="{p}overview" data-doc="{k}"{" class=" + chr(34) + "on" + chr(34) if k == "flow" else ""}>{esc(d["title"])}</a>'
                    for k, p, d in guides)
     return (f'<header class="masthead"><p class="brand">{MARK}<b>Lucidex</b> <span>Group</span></p>'
