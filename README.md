@@ -14,6 +14,8 @@ The page is built from the files in `site/source/`:
 python3 site/source/build.py
 ```
 
+The guide is published at https://lucidex-group.github.io/feature-promotion-flow/. `.github/workflows/pages.yml` publishes `site/` each time `main` changes, that is, with each release.
+
 ## The skills
 
 `plugin/` is a package of six skills: the method, setting a project up, starting a feature, building to `development`, making a release, and making a hotfix. It is a Claude Code plugin:
