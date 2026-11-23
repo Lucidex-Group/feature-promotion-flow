@@ -21,12 +21,6 @@ def shot(name, alt, caption):
             f'<figcaption>{caption}</figcaption></figure>')
 
 
-def shots():
-    """The names of the screenshots the tab shows, for the suite to check that each file is there."""
-    import re
-    return sorted(set(re.findall(r"shot\('([\w-]+)'", open(__file__).read())))
-
-
 DOES = [
     ('It keeps the backlog', 'Use cases and their flows, the stories sliced from them, the work items that deliver each story, and the scenarios each one has to meet. Each item carries its status, its order and who it is assigned to.'),
     ('It keeps the decisions and the evidence', 'Decisions are kept in the words of whoever made them, beside the thing they are about. Estimates, attempts, test runs and code reviews are kept on the work item they belong to.'),
@@ -73,7 +67,7 @@ def doc():
             ('about', 'What Docket is',
              '<p class="say">Docket is a program that keeps a record of everything a software project creates, in the project\'s own repository, for people and agents to work through: use cases, stories, scenarios, work items, decisions, and the evidence of what was done and tested.</p>'
              '<p class="note">It is a ticket tracker whose tickets are files in the repository. It was built to run Feature Promotion Flow, and the second tab of this guide describes the flow as a project on Docket runs it.</p>'
-             + shot('work', 'Docket\'s Work page for the made-up lending library: use cases, stories, decisions and work items in one table, with status and estimates.',
+             + pages_intro + shot('work', 'Docket\'s Work page for the made-up lending library: use cases, stories, decisions and work items in one table, with status and estimates.',
                     '<b>The Work page.</b> The backlog as one table: each use case, the stories sliced from it, the decisions beside them and the work items that deliver them, in the order of work, with status, estimate and actual effort. A proposed decision that waits on a person is marked as needing attention.')),
             ('does', 'What it does', cards(DOES)),
             ('works', 'How it works', cards(WORKS, 'gives two')),
@@ -85,8 +79,7 @@ def doc():
         ('Its pages', 'What a person sees, page by page.', [
             ('layout', 'How the pages are arranged',
              '<p class="say">The pages follow the life of the work. <b>Define:</b> Principles and Decisions. <b>Do:</b> Work, the backlog as one table, with what needs attention. <b>Deliver:</b> Environments, History and Reports. <b>Project:</b> Artifacts, Participants, Record health and the Guide. <b>You:</b> Settings.</p>'
-             '<p class="note">Everything in the backlog opens where it is, in the Work table: choose a row and it unfolds beneath itself, with what can be done to it.</p>'
-             + pages_intro),
+             '<p class="note">Everything in the backlog opens where it is, in the Work table: choose a row and it unfolds beneath itself, with what can be done to it.</p>'),
             ('work-item', 'A work item',
              '<p class="say">A work item, opened in the Work table, shows where it stands, how it got there and what it was tested against.</p>'
              + shot('work-item', 'A work item opened in Docket\'s Work table, Borrowing at the desk: its effort and budget, its status done and released, buttons to accept it or object, and its line of stamped times.',
