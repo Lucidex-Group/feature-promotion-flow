@@ -49,7 +49,7 @@ GUARDS = [
     ('A commit hook', 'Keeps code off <code>docket-record</code> and the record off features. The one change to the record a feature may make is taking the <code>@wip</code> tag off the scenarios it builds.'),
     ('Status against the merges', 'A work item cannot be set done while a branch of its own holds work that is not released. <code>docket check</code> lists each status the merges contradict.'),
     ('A plan to rebuild', '<code>docket rebuild</code> gives the plan, with the commands, to rebuild <code>development</code> or <code>stage</code> from the released branch, leaving out what must come out. It runs none of them.'),
-    ('The skills that go with it', 'Docket installs the skills an agent needs: those of the flow, worded for a project on Docket, and two of its own, under <a href="#its-skills">Its own skills</a>. <code>docket skills install</code> says what it will write before it writes it.'),
+    ('The skills that go with it', 'Docket installs the skills an agent needs: five of the flow\'s, as the standards write them, and two of its own, under <a href="#its-skills">Its own skills</a>. <code>docket skills install</code> says what it will write before it writes it.'),
 ]
 OWN_SKILLS = [
     ('docket-flow', 'What Docket changes in the flow', 'What Docket adds to Feature Promotion Flow in a project that keeps its record with Docket: the <code>docket-record</code> branch between <code>main</code> and a feature, where the record is written, and what is recorded at each step. An agent loads it together with the flow\'s own skills, before any Git command that changes anything, in a project that has a <code>.docket/</code> folder.'),
@@ -118,7 +118,7 @@ def doc():
             ('each-step', 'What is recorded at each step', cards(STEPS)),
             ('guards', 'What keeps the flow straight', cards(GUARDS, 'gives two')),
             ('its-skills', 'Its own skills',
-             '<p class="say">Docket installs five of the flow\'s skills, worded for a project on Docket, and two of its own. Setting a project up is done by its own adoption skill, in place of the flow\'s. The flow\'s skills are in the <a href="#s-overview">Skills</a> tab; Docket\'s own two are these.</p>'
+             '<p class="say">Docket installs five of the flow\'s skills as the standards write them, each with a note that a project on Docket reads it together with <code>docket-flow</code>, which governs where they differ, and two of its own. Setting a project up is done by its own adoption skill, in place of the flow\'s. The flow\'s skills are in the <a href="#s-overview">Skills</a> tab; Docket\'s own two are these.</p>'
              + '<ul class="gives two">' + ''.join(f'<li><h3>{esc(t)}</h3><p class="skillname">The skill <code>{esc(n)}</code></p><p>{d}</p></li>' for n, t, d in OWN_SKILLS) + '</ul>'
              + '<p class="note">Docket is not yet published, so the text of these two skills is not shown here. It comes with Docket, and <code>docket skills install</code> writes it into a project.</p>'),
         ]),
