@@ -18,6 +18,8 @@ concurrency:
 
 jobs:
   publish:
+    # A run started by hand can be pointed at any branch; only main is the release, so only main is published.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
