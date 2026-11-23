@@ -29,9 +29,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 background:var(--ink);color:var(--ink-text);color-scheme:dark}
 .masthead p{margin:0}
 .masthead .brand{display:flex;align-items:center;gap:12px;margin-bottom:34px;font:500 11px/1 var(--head);letter-spacing:.26em;color:var(--ink-text)}
+.masthead .brand b{font-weight:500;text-transform:uppercase}
 .masthead .brand span{padding-left:12px;border-left:1px solid var(--ink-line);font-weight:300;font-size:13px;letter-spacing:.02em;color:var(--ink-muted)}
 .masthead .name{font:200 clamp(42px,7.2vw,96px)/.94 var(--head);letter-spacing:-.045em;color:var(--ink-text);text-wrap:balance}
-.masthead .name .dot{color:var(--brand)}
+.masthead .name::after{content:".";content:"." / "";color:var(--brand)}
 .masthead .tagline{max-width:58ch;margin-top:22px;font:300 clamp(17px,1.7vw,21px)/1.45 var(--head);color:var(--ink-muted)}
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;height:var(--bar);display:flex;align-items:flex-end;overflow-x:auto;
 padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));background:var(--ink);border-top:1px solid var(--ink-line);color-scheme:dark}
