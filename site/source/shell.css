@@ -1,4 +1,4 @@
-/* The page around the guide: a Lucidex Group header, two tabs under it, the contents on the left, one part to a page.
+/* The page around the guide: a Lucidex Group header, three tabs under it, the contents on the left, one part to a page.
    Lucidex ink and paper, one orange; Helvetica Neue (Inter Tight where it is missing) in light weights for headings, JetBrains Mono for labels.
    figures.css comes first and holds the guide's own styles; the tokens and rules here replace the ones it sets. */
 :root{--ground:#F5F6F8;--text:#1A1C20;--muted:#5F6775;--dim:#68707E;--panel:#FFFFFF;--raised:#F0F2F5;--border:#E3E7ED;--border-strong:#C9CFD8;--hair:#ECEFF3;--rail:#FFFFFF;
@@ -134,3 +134,14 @@ padding:20px 12px 20px max(12px,env(safe-area-inset-left,0px));background:var(--
 @media (max-width:860px){.gdoc .holds.four{grid-template-columns:repeat(2,1fr)}}
 .gdoc table.setup td:first-child{width:36%;color:var(--text);font-weight:500}
 .gdoc table.setup pre{margin:10px 0 0;padding:8px 10px;border-radius:var(--rc);background:var(--raised);border:1px solid var(--hair);font:12px/1.6 var(--mono);color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* The third tab's screenshots: a frame like a figure, the caption under it, full width on a phone. */
+.gdoc figure.shot{margin:0;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;max-width:880px}
+.gdoc figure.shot a{display:block;line-height:0;border-bottom:1px solid var(--border)}
+.gdoc figure.shot img{display:block;width:100%;height:auto}
+.gdoc figure.shot figcaption{padding:12px 16px 14px;font-size:14px;line-height:1.55;color:var(--muted)}
+.gdoc figure.shot figcaption b{color:var(--text);font-weight:500}
+/* A card in the third tab may hold a long command; let it break rather than widen the page on a phone. */
+.gdoc[data-doc="app"] .gives li{min-width:0}
+.gdoc[data-doc="app"] .gives code{white-space:normal;overflow-wrap:anywhere}
+.gdoc .shotnote{padding:12px 16px;border-left:2px solid var(--brand);background:var(--panel);border-radius:0 var(--rx) var(--rx) 0}
