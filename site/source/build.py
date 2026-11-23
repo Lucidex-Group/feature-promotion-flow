@@ -16,7 +16,10 @@ import docket, flow  # noqa: E402
 from drawing import esc  # noqa: E402
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">')
+         '<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">')
+# The Lucidex Group mark: an orange triangle, a second triangle and a dot, the last two in the colour of the text around them.
+MARK = ('<svg class="mark" viewBox="0 0 56 40" aria-hidden="true"><path d="M0 2 L0 36 L34 36 Z" fill="#F25C1F"/>'
+        '<path d="M30 16 L52 16 L52 38 Z" fill="currentColor"/><circle cx="50.3" cy="4.3" r="4.3" fill="currentColor"/></svg>')
 
 
 def read(name):
@@ -91,11 +94,12 @@ def body():
     built = [guide(k, p, d) for k, p, d in guides]
     tabs = ''.join(f'<a href="#{p}overview" data-go="{p}overview" data-doc="{k}"{" class=" + chr(34) + "on" + chr(34) if k == "flow" else ""}>{esc(d["title"])}</a>'
                    for k, p, d in guides)
-    return ('<header class="masthead"><p class="owner">Lucidex Group</p><p class="name">Feature Promotion Flow</p>'
+    return (f'<header class="masthead"><p class="brand" aria-label="Lucidex Group">{MARK}<b>LUCIDEX</b><span>Group</span></p>'
+            '<p class="name">Feature Promotion Flow<span class="dot" aria-hidden="true">.</span></p>'
             '<p class="tagline">A way of branching and releasing with Git, in which features are tested together and a release is chosen feature by feature.</p></header>'
             f'<div class="bar"><nav class="tabs" aria-label="Which guide">{tabs}</nav></div>'
             '<div class="shell"><nav class="rail" id="rail" aria-label="Contents"><button type="button" class="fold" aria-expanded="false" aria-controls="trees">Contents</button>'
-            '<div id="trees">' + ''.join(t for t, _ in built) + '</div><div class="copyright">© 2026 Lucidex Group</div></nav>'
+            '<div id="trees">' + ''.join(t for t, _ in built) + '</div><div class="copyright">' + MARK + '© 2026 Lucidex Group</div></nav>'
             '<div class="content"><main>' + ''.join(g for _, g in built) + '</main></div></div>')
 
 
