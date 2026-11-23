@@ -48,6 +48,39 @@ def the_site_builds():
     return 'images the page names that are not there: ' + ', '.join(missing) if missing else ''
 
 
+def switching_tabs_leads_where_it_should():
+    """The tab rules in site/source/tabs.js, run with Node against the places in the built page."""
+    page = open(os.path.join(ROOT, 'site', 'index.html')).read()
+    ids = re.findall(r' id="([\w-]+)"', page)
+    shared = sorted({i[2:] for i in ids if i.startswith('a-')} & ({i for i in ids if not i.startswith(('a-', 'd-'))} | {i[2:] for i in ids if i.startswith('d-')})
+                    - {'overview'} - {i for i in ids if re.fullmatch(r'part-\d+', i)})
+    if shared:
+        return 'the Docket tab has sections named as in the other tabs, so switching would land on an unrelated one: ' + ', '.join(shared)
+    # Each case: the place the reader is at, its part, and where each of the three tabs should then lead.
+    cases = [
+        ('', 'overview', 'part-1', ['overview', 'd-overview', 'a-overview']),
+        ('road', 'road', 'part-3', ['road', 'd-road', 'a-overview']),
+        ('d-why', 'why', 'part-2', ['why', 'd-why', 'a-overview']),
+        ('part-2', 'part-2', 'part-2', ['part-2', 'd-part-2', 'a-overview']),
+        ('d-adds', 'adds', 'part-1', ['part-1', 'd-adds', 'a-overview']),
+        ('a-releases', 'releases', 'part-2', ['overview', 'd-overview', 'a-releases']),
+        ('a-part-3', 'part-3', 'part-3', ['overview', 'd-overview', 'a-part-3']),
+    ]
+    script = ("const T = require(process.argv[1]); const ids = new Set(JSON.parse(process.argv[2])); const cases = JSON.parse(process.argv[3]);"
+              "const out = cases.map(([id, key, part]) => { const p = T.parts(id); return [p.doc, p.key, ['flow', 'docket', 'app'].map(t => T.target(t, p.doc, key, part, x => ids.has(x)))]; });"
+              "console.log(JSON.stringify(out));")
+    import json
+    done = run('node', '-e', script, os.path.join(ROOT, 'site', 'source', 'tabs.js'), json.dumps(ids), json.dumps(cases))
+    if done.returncode:
+        return 'node could not run the tab rules: ' + (done.stderr or done.stdout).strip()[-300:]
+    for (id, key, _, want), (doc, got_key, got) in zip(cases, json.loads(done.stdout)):
+        if got_key != key:
+            return f'the place "{id or "(none)"}" was read as "{got_key}" in the {doc} guide'
+        if got != want:
+            return f'from "{id or "(none)"}" the tabs lead to {got}, not {want}'
+    return ''
+
+
 def the_plugin_is_valid():
     for target in ('plugin', '.'):
         done = run('claude', 'plugin', 'validate', target)
@@ -101,6 +134,7 @@ def a_zip_can_be_made():
 
 
 check('The site builds, with no place named twice, no link that leads nowhere and no image missing', the_site_builds())
+check('Switching tabs leads to the same place, the same part, or the overview, as the guide says', switching_tabs_leads_where_it_should())
 check('The package is a valid plugin, and the repository a valid marketplace', the_plugin_is_valid())
 check('Every skill loads: a name matching its folder and a description that says when to use it', every_skill_loads())
 check('The package stands alone: no private reference, and every file it points to is inside it', the_package_stands_alone())

@@ -133,7 +133,7 @@ def body():
 
 def main():
     css = read('figures.css') + read('shell.css')
-    js = read('figures.js') + read('shell.js')
+    js = read('figures.js') + read('tabs.js') + read('shell.js')
     top = f'<title>Feature Promotion Flow</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n{FONTS}\n<style>{css}</style>\n'
     page = body()
     open(os.path.join(HERE, '..', 'index.html'), 'w').write(

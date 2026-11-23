@@ -101,7 +101,7 @@ def doc():
              '<p class="say">The Environments page shows what each branch carries, read from the merges each time.</p>'
              + shot('environments', 'Docket\'s Environments page: Development carries Reservations and Borrowing at the desk; Stage carries Borrowing at the desk; Released below.',
                     '<b>Environments.</b> The branch is the environment, and a merge into it is the promotion. Reservations is on <code>development</code> only; Borrowing at the desk has reached <code>stage</code> and been released. Nothing was recorded to say so: it is read from the merge titles.')),
-            ('history', 'The releases',
+            ('releases', 'The releases',
              '<p class="say">The History page lists the releases, newest first, as an agent reported each one after the promotion.</p>'
              + shot('history', 'Docket\'s History page: release v0.1.0 with its date, commit, the pull request that promoted it, its two tags on the release\'s commit, its work item, QA, what was verified, and who accepted it.',
                     '<b>A release.</b> The pull request that promoted it, its two tags, the work items it brought and the pull request of each, the commit QA tested, what was verified, and who accepted it. Docket checked against Git that the commit, the tags and the merges are where the agent said; the rest is as the agent stated it, and the page says which is which.')),

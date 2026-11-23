@@ -1,7 +1,5 @@
 // The three tabs and the contents: one guide is shown at a time, one part of it to a page.
-// A place in the guide with Docket has the same name as in the flow on its own, with "d-" in front.
-// The third tab, Docket itself, names its places with "a-"; it has sections of its own, so switching to or from it
-// goes to the same place where there is one, and otherwise to the same part or the overview.
+// How places are named in each guide, and where each tab leads, is in tabs.js.
 (function () {
   var all = function (sel, root) { return [].slice.call((root || document).querySelectorAll(sel)); };
   var docs = all('.gdoc'), trees = all('.gtree'), tabs = all('.tabs a');
@@ -10,14 +8,8 @@
   function unfold(open) { rail.classList.toggle('open', open); fold.setAttribute('aria-expanded', String(open)); }
   fold.addEventListener('click', function () { unfold(!rail.classList.contains('open')); });
 
-  var PREFIX = { flow: '', docket: 'd-', app: 'a-' };
-  function name(doc, key) { return PREFIX[doc] + key; }
-  function parts(id) {
-    id = id || 'overview';
-    if (/^d-/.test(id)) return { doc: 'docket', key: id.slice(2) };
-    if (/^a-/.test(id)) return { doc: 'app', key: id.slice(2) };
-    return { doc: 'flow', key: id };
-  }
+  var name = FPF_TABS.name, parts = FPF_TABS.parts;
+  function has(id) { return !!document.getElementById(id); }
 
   function show(id, scroll) {
     var el = id && document.getElementById(id);
@@ -38,13 +30,10 @@
       t.querySelector('a.ov').classList.toggle('cur', key === 'overview');
       all('ol a', t).forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-go') === id); });
     });
-    // Each tab leads to the same place in its own guide. Where that guide has no such section, the first two tabs lead to the
-    // same part, since their parts match; the third tab's parts are its own, so to or from it the tab leads to the overview.
+    // Where each tab leads from here: see tabs.js.
     tabs.forEach(function (t) {
       var d = t.getAttribute('data-doc'), on = d === doc;
-      var same = d === doc || (d !== 'app' && doc !== 'app');
-      var section = key !== 'overview' && !/^part-\d+$/.test(key);
-      var to = document.getElementById(name(d, key)) && (same || section) ? name(d, key) : name(d, same ? part : 'overview');
+      var to = FPF_TABS.target(d, doc, key, part, has);
       t.classList.toggle('on', on);
       t.setAttribute('aria-current', on ? 'page' : 'false');
       t.setAttribute('href', '#' + to);
