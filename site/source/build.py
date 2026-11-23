@@ -94,7 +94,7 @@ def body():
     built = [guide(k, p, d) for k, p, d in guides]
     tabs = ''.join(f'<a href="#{p}overview" data-go="{p}overview" data-doc="{k}"{" class=" + chr(34) + "on" + chr(34) if k == "flow" else ""}>{esc(d["title"])}</a>'
                    for k, p, d in guides)
-    return (f'<header class="masthead"><p class="brand">{MARK}<b>Lucidex</b><span>Group</span></p>'
+    return (f'<header class="masthead"><p class="brand">{MARK}<b>Lucidex</b> <span>Group</span></p>'
             '<p class="name">Feature Promotion Flow</p>'
             '<p class="tagline">A way of branching and releasing with Git, in which features are tested together and a release is chosen feature by feature.</p></header>'
             f'<div class="bar"><nav class="tabs" aria-label="Which guide">{tabs}</nav></div>'
