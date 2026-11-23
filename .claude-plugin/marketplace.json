@@ -1,0 +1,14 @@
+{
+  "name": "lucidex-feature-promotion-flow",
+  "description": "Skills for Feature Promotion Flow, a way of branching and releasing with Git, from Lucidex Group.",
+  "owner": {
+    "name": "Lucidex Group"
+  },
+  "plugins": [
+    {
+      "name": "feature-promotion-flow",
+      "source": "./plugin",
+      "description": "Feature Promotion Flow (FPF): skills for branching and releasing with Git, where a release is chosen feature by feature."
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+"""The project's tests: the site builds and is whole, and the skills package is a plugin that stands alone.
+
+    python3 tools/test.py
+
+Prints a line for each check and exits 1 if any fails.
+"""
+import os, re, subprocess, sys, tempfile, zipfile
+
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+PLUGIN = os.path.join(ROOT, 'plugin')
+SKILLS = ['feature-promotion-flow', 'fpf-set-up-project', 'fpf-start-feature', 'fpf-build-to-development', 'fpf-release', 'fpf-hotfix']
+# What a stand-alone package must not lean on: a folder or a commit only its authors have, another product, or wording about one particular person.
+PRIVATE = re.compile(r'~/Development/(?!worktrees/|<Project>)|docket|global instructions|commit [0-9a-f]{7}|\b(he|his|him)\b', re.I)
+failures = []
+
+
+def check(name, problem):
+    print(('ok    ' if not problem else 'FAIL  ') + name + (': ' + problem if problem else ''))
+    if problem:
+        failures.append(name)
+
+
+def run(*cmd):
+    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+
+
+def package_files():
+    for folder, _, names in os.walk(PLUGIN):
+        for name in names:
+            if name.endswith(('.md', '.json')):
+                yield os.path.join(folder, name)
+
+
+def the_site_builds():
+    done = run(sys.executable, os.path.join('site', 'source', 'build.py'))
+    if done.returncode or done.stdout.strip() != 'ok':
+        return 'the build did not print ok: ' + (done.stderr or done.stdout).strip()[-300:]
+    page = open(os.path.join(ROOT, 'site', 'index.html')).read()
+    ids = re.findall(r' id="([\w-]+)"', page)
+    twice = sorted({i for i in ids if ids.count(i) > 1})
+    nowhere = sorted(set(re.findall(r' href="#([\w-]+)"', page)) - set(ids))
+    if twice:
+        return 'places named twice: ' + ', '.join(twice)
+    return 'links that lead nowhere: ' + ', '.join(nowhere) if nowhere else ''
+
+
+def the_plugin_is_valid():
+    for target in ('plugin', '.'):
+        done = run('claude', 'plugin', 'validate', target)
+        if done.returncode:
+            return f'claude plugin validate {target} failed: ' + (done.stdout + done.stderr).strip()[-300:]
+    return ''
+
+
+def every_skill_loads():
+    found = sorted(os.listdir(os.path.join(PLUGIN, 'skills')))
+    if found != sorted(SKILLS):
+        return f'the skills are {found}'
+    for skill in SKILLS:
+        text = open(os.path.join(PLUGIN, 'skills', skill, 'SKILL.md')).read()
+        front = re.match(r'---\nname: ([\w-]+)\ndescription: "(.+)"\n---\n', text)
+        if not front or front.group(1) != skill:
+            return f'{skill}: the front matter does not name it'
+        if 'Use ' not in front.group(2) and 'Load ' not in front.group(2):
+            return f'{skill}: the description does not say when to use it'
+    return ''
+
+
+def the_package_stands_alone():
+    for path in package_files():
+        text = open(path).read()
+        hit = re.search(r'global instructions|commit [0-9a-f]{7}', text, re.I) if path.endswith('README.md') else PRIVATE.search(text)
+        if hit:
+            return f'{os.path.relpath(path, ROOT)} refers to "{hit.group(0)}"'
+        for link in re.findall(r'\]\(([^)#]+)\)', text):
+            if not link.startswith('http') and not os.path.exists(os.path.join(os.path.dirname(path), link)):
+                return f'{os.path.relpath(path, ROOT)} points to {link}, which is not in the package'
+    return ''
+
+
+def a_zip_can_be_made():
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, 'package.zip')
+        done = run(sys.executable, os.path.join('tools', 'package.py'), out)
+        if done.returncode:
+            return done.stderr.strip()[-300:]
+        names = zipfile.ZipFile(out).namelist()
+        if any(not n.startswith('feature-promotion-flow/') for n in names):
+            return 'the zip holds something outside the package'
+        need = ['feature-promotion-flow/.claude-plugin/plugin.json'] + [f'feature-promotion-flow/skills/{s}/SKILL.md' for s in SKILLS]
+        missing = [n for n in need if n not in names]
+        if missing:
+            return 'the zip lacks ' + ', '.join(missing)
+        zipfile.ZipFile(out).extractall(tmp)
+        done = run('claude', 'plugin', 'validate', os.path.join(tmp, 'feature-promotion-flow'))
+        return 'the unpacked zip is not a valid plugin' if done.returncode else ''
+
+
+check('The site builds, with no place named twice and no link that leads nowhere', the_site_builds())
+check('The package is a valid plugin, and the repository a valid marketplace', the_plugin_is_valid())
+check('Every skill loads: a name matching its folder and a description that says when to use it', every_skill_loads())
+check('The package stands alone: no private reference, and every file it points to is inside it', the_package_stands_alone())
+check('A zip can be made that unpacks to the plugin and nothing else', a_zip_can_be_made())
+sys.exit(1 if failures else 0)
