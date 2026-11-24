@@ -6,7 +6,7 @@ This repository holds the guide to the method and a package of skills for an age
 
 ## The guide
 
-`site/index.html` is the guide: one web page with four tabs. The first is the flow on its own. The second is the skills delivered with it: what each does, how to install them, and each skill's whole text, read from `plugin/skills/` when the page is built. The third is the flow in a project that keeps its record with Docket, a program from Lucidex Group that is not yet published. The fourth is Docket itself: what it does, its pages in screenshots, how it runs the flow, and its own skills. Open the file in a browser; the screenshots are in `site/images/docket/` beside it. Nothing has to be installed; the page loads its fonts from Google Fonts, and falls back to the system's own where it cannot.
+`site/index.html` is the guide: one web page with four tabs. The first is the flow on its own. The second is the skills delivered with it: what each does, how to install them, and each skill's whole text, read from `plugin/skills/` when the page is built. The third is the flow in a project that keeps its record with Docket, a program from Lucidex Group whose programs are published as releases of this repository, tagged `docket-v…`. The fourth is Docket itself: what it does, its pages in screenshots, how it runs the flow, and its own skills. Open the file in a browser; the screenshots are in `site/images/docket/` beside it. Nothing has to be installed; the page loads its fonts from Google Fonts, and falls back to the system's own where it cannot.
 
 The page is built from the files in `site/source/`:
 
