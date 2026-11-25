@@ -1,6 +1,6 @@
 """The third tab: Docket, the application. What it is, what it does, what it looks like, and how it runs Feature Promotion Flow.
 
-The screenshots are files in site/images/docket/, taken of Docket v0.13.0, the released program, on November 24, 2026,
+The screenshots are files in site/images/docket/, taken of Docket v0.14.0, the released program, on November 25, 2026,
 serving a made-up project, a lending library, written for this guide, with a remote of its own. Each page was reached by
 clicking through the app.
 """
@@ -8,7 +8,7 @@ from html import escape as esc
 
 SHOTS = 'images/docket/'
 # The Docket release this tab describes, and where its files are published.
-VERSION = 'v0.13.0'
+VERSION = 'v0.14.0'
 RELEASE = f'https://github.com/Lucidex-Group/feature-promotion-flow/releases/tag/docket-{VERSION}'
 FILES = [
     ('macOS, Apple silicon', f'docket-{VERSION}-darwin-arm64', 'macOS 13.0 or later. Not signed by Apple, not notarised.'),
@@ -24,10 +24,10 @@ LIMITS = [
     'No agent has yet been run through a whole adoption with the adoption skill; three of its scenarios are checked as text only.',
     'No program from this release has been started on a Mac older than macOS 27.2, or on Windows. The minimum of macOS 13.0 is what the programs say they need, read from them, not something run.',
     'Docket\'s own pages, and the call an agent makes to report it, still call the one run of the whole suite on stage "testing together", an older name. The guide and the skills call it the suite\'s run. It is the same run.',
-    'Docket does not make the regression count. It carries no script for it and does not tie a test\'s result to the scenario the test names, so a project writes its own script, or the run says the count was not made.',
+    'Docket makes the regression count from the report files a suite\'s run names, and ties a test to its scenario only by a comment directly above where the test is declared. A test that names its scenario inside its body is not tied to it.',
     'Docket refuses a QA run that does not give a result for every scenario the release names. After a fix on stage, the fresh QA agent restates the scenarios it did not check again, each with a note that it stands from the earlier check.',
     'Docket\'s pages fetch their fonts from Google\'s servers, so the program reaches the internet, and looks different without a connection.',
-    'Docket reads where a work item stands from this machine\'s own copies of development, stage and main, so it can say a feature is merged nowhere until those copies are brought up to the Git host\'s.',
+    'After a fetch from the Git host that failed, the time of the last fetch shown at the top of Docket\'s pages is more recent than the last fetch that succeeded.',
     'Two lines of advice from docket assess still say stage is reset to main after a production deployment; the method has stage stay as it is after a release.',
 ]
 SHOT_SIZE = (800, 692)
@@ -118,7 +118,7 @@ def get_docket():
 
 def doc():
     pages_intro = (f'<p class="note shotnote"><b>About the screenshots.</b> They are of Docket {VERSION}, the released program, serving a small made-up project, a lending library, written for this guide. '
-                   'No real project\'s record is shown. Choose a screenshot to open it full size.</p>')
+                   'No real project\'s record is shown. Across the top of each page, a strip names the four branches, <code>development</code>, <code>stage</code>, <code>docket-record</code> and <code>main</code>, each with a few words on where it stands. Choose a screenshot to open it full size.</p>')
     parts = [
         ('What Docket is', 'For a person deciding whether to put a project on Docket.', [
             ('docket', 'What Docket is',
