@@ -1,7 +1,7 @@
 {
   "name": "feature-promotion-flow",
-  "version": "0.1.0",
-  "description": "Feature Promotion Flow (FPF): a way of branching and releasing with Git in which features are tested together on development and a release is chosen feature by feature on stage. Six skills: the method, setting a project up, starting a feature, building to development, making a release, and making a hotfix.",
+  "version": "0.2.0",
+  "description": "Feature Promotion Flow (FPF): a way of branching and releasing with Git in which features are merged on development and a release is built feature by feature on stage, where the whole suite runs once. Six skills: the method, setting a project up, starting a feature, building to development, making a release, and making a hotfix.",
   "author": {
     "name": "Lucidex Group"
   },

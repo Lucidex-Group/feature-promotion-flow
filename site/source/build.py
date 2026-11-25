@@ -124,7 +124,7 @@ def body():
                    for k, p, d in guides)
     return (f'<header class="masthead"><p class="brand">{MARK}<b>Lucidex</b> <span>Group</span></p>'
             '<p class="name">Feature Promotion Flow</p>'
-            '<p class="tagline">A way of branching and releasing with Git, in which features are tested together and a release is chosen feature by feature.</p></header>'
+            '<p class="tagline">A way of branching and releasing with Git, in which features are merged on development and each release is built on stage from the features listed for it, where the whole suite runs once.</p></header>'
             f'<div class="bar"><nav class="tabs" aria-label="Which guide">{tabs}</nav></div>'
             '<div class="shell"><nav class="rail" id="rail" aria-label="Contents"><button type="button" class="fold" aria-expanded="false" aria-controls="trees">Contents</button>'
             '<div id="trees">' + ''.join(t for t, _ in built) + '</div><div class="copyright">' + MARK + '© 2026 Lucidex Group</div></nav>'
