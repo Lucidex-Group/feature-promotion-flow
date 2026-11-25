@@ -368,8 +368,8 @@ def loop():
     f.rlink('feat', .415, A, .455, S); f.rdot('stage', .455, S, 'm')
     f.num(.478, S + 21, 3); f.out(.44, '3  on the\nrelease list')
     f.step(SUITE_SAY + ' ' + QA_SAY)
-    f.rdot('stage', .515, S, 'q')
-    f.num(.535, S + 23, 4); f.out(.515, '4  the suite,\nthen QA')
+    f.rdot('stage', .503, S, 'q', tip=SUITE_TIP); f.rdot('stage', .53, S, 'q')
+    f.num(.552, S + 23, 4); f.out(.515, '4  the suite,\nthen QA')
     f.step(ACCEPT_SAY)
     f.rlink('stage', .60, S, .635, M); f.rdot('main', .635, M, 'm')
     x, y = f.pt(.69, M + 21)
@@ -723,7 +723,7 @@ STATIONS = [
     ('feat', 'Code review', 'The code and its tests, on the feature\'s own branch, by an agent that did not write them', 'A report: the decision, and each finding with its kind and how it ended'),
     ('dev', 'development', 'Nothing is run. The features are merged', 'A conflict between features shows, and is resolved by a merge branch'),
     ('stage', 'The suite\'s run', 'The whole suite, once, on the named commit of stage', 'The commit, and each command with its result'),
-    ('stage', 'QA', 'Each scenario the release names, read against its tests and checked by hand where they fall short, by a fresh agent', 'QA\'s report: the commit checked, the result for each scenario, and what was checked by hand'),
+    ('stage', 'QA', 'Each scenario the release names, read against its tests and checked by hand where they fall short, by a fresh agent. It does not run the suite', 'QA\'s report: the commit checked, the result for each scenario, and what was checked by hand'),
     ('main', 'Promotion', 'The maintainer\'s acceptance', 'The promotion of stage to main, and the release\'s two tags'),
 ]
 

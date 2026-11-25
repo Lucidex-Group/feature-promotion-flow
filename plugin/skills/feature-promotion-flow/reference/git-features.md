@@ -16,4 +16,4 @@
 - **Recorded resolutions are kept per clone.** Every worktree of one clone shares them; another clone, on the same machine or another, does not have them. Git has no means of sharing them.
 - **A worktree needs its own setup step in a fresh clone.** An agent starting there has to be told.
 
-Drawn from Lucidex Group's development standards, as they stood on November 22, 2026.
+Drawn from Lucidex Group's development standards, as they stood on November 24, 2026.
