@@ -1,12 +1,12 @@
 # Feature Promotion Flow
 
-Feature Promotion Flow (FPF) is a way of branching and releasing with Git. Each feature is built on its own branch, cut from `main`. Features are merged into `development` to be tested together. A release is assembled on `stage` from the features chosen for it, verified there, and promoted to `main`. Being on `development` says nothing about release: the release set is chosen, feature by feature.
+Feature Promotion Flow (FPF) is a way of branching and releasing with Git. Each feature is built on its own branch, cut from `main`. Features are merged into `development`, where their conflicts show. A release is built on `stage` from the features the maintainer lists for it, tested and checked there, and promoted to `main`. Being on `development` says nothing about release: the release list is named, feature by feature.
 
 This repository holds the guide to the method and a package of skills for an agent working by it.
 
 ## The guide
 
-`site/index.html` is the guide: one web page with four tabs. The first is the flow on its own. The second is the skills delivered with it: what each does, how to install them, and each skill's whole text, read from `plugin/skills/` when the page is built. The third is the flow in a project that keeps its record with Docket, a program from Lucidex Group that is not yet published. The fourth is Docket itself: what it does, its pages in screenshots, how it runs the flow, and its own skills. Open the file in a browser; the screenshots are in `site/images/docket/` beside it. Nothing has to be installed; the page loads its fonts from Google Fonts, and falls back to the system's own where it cannot.
+`site/index.html` is the guide: one web page with four tabs. The first is the flow on its own. The second is the skills delivered with it: what each does, how to install them, and each skill's whole text, read from `plugin/skills/` when the page is built. The third is the flow in a project that keeps its record with Docket, a program from Lucidex Group whose programs are published as releases of this repository, tagged `docket-v…`. The fourth is Docket itself: what it does, its pages in screenshots, how it runs the flow, and its own skills. Open the file in a browser; the screenshots are in `site/images/docket/` beside it. Nothing has to be installed; the page loads its fonts from Google Fonts, and falls back to the system's own where it cannot.
 
 The page is built from the files in `site/source/`:
 

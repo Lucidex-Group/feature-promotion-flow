@@ -24,11 +24,11 @@ The rules for it:
 - **It is never merged into `development`, `stage` or `main`,** and no feature is cut from it. The members reach `development` and `stage` one by one, each from its own branch, each by its own pull request.
 - **A member's tests may pass only there.** A member that calls another member's code cannot pass in its own folder until the other is released. Its test run is made in the coordination branch's folder, and says that it was made there and names the commit of each member it was run with. That result stands in place of one from the member's own folder. If any member changes afterwards, the result is out of date and the tests are run there again.
 - **A member goes into `development` or `stage` only with, or after, the members it requires,** in the order they require. Its passing result was earned with them present and holds only with them present.
-- **The members may be released together, or held until they are ready.** That is the maintainer's choice of release set, as for any feature.
+- **The members may be released together, or held until they are ready.** That is the maintainer's choice of release list, as for any feature.
 - **One agent may hold every member and the coordination branch.** Where several agents hold the members, one of them holds the coordination branch's folder, and the coordination says which.
 - **It is temporary.** When every member has been released, the coordination is closed and the branch has done its work.
 - **Conflicts between members are met here first.** With reuse of recorded resolutions on, a conflict resolved on the coordination branch is replayed when the members meet again on `development` and `stage`.
 
-Three kinds of branch hold merges and no work of their own, and differ in where they end: the coordination branch, which is never merged anywhere; the candidate built to test a release set, which is never merged anywhere either; and the `merge/<feature id>-into-<branch>` branch made to resolve a conflict, which exists to be merged into `development` or `stage` by pull request.
+Two kinds of branch hold merges and no work of their own, and differ in where they end: the coordination branch, which is never merged anywhere; and the `merge/<feature id>-into-<branch>` branch made to resolve a conflict, which exists to be merged into `development` or `stage` by pull request.
 
-Drawn from Lucidex Group's development standards, as they stood on November 22, 2026.
+Drawn from Lucidex Group's development standards, as they stood on November 24, 2026.

@@ -1,11 +1,35 @@
 """The third tab: Docket, the application. What it is, what it does, what it looks like, and how it runs Feature Promotion Flow.
 
-The screenshots are files in site/images/docket/, taken of Docket built from its development branch on November 23, 2026,
-serving a made-up project, a lending library, written for this guide. Each page was reached by clicking through the app.
+The screenshots are files in site/images/docket/, taken of Docket v0.13.0, the released program, on November 24, 2026,
+serving a made-up project, a lending library, written for this guide, with a remote of its own. Each page was reached by
+clicking through the app.
 """
 from html import escape as esc
 
 SHOTS = 'images/docket/'
+# The Docket release this tab describes, and where its files are published.
+VERSION = 'v0.13.0'
+RELEASE = f'https://github.com/Lucidex-Group/feature-promotion-flow/releases/tag/docket-{VERSION}'
+FILES = [
+    ('macOS, Apple silicon', f'docket-{VERSION}-darwin-arm64', 'macOS 13.0 or later. Not signed by Apple, not notarised.'),
+    ('macOS, Intel', f'docket-{VERSION}-darwin-amd64', 'macOS 13.0 or later. Not signed by Apple, not notarised.'),
+    ('Linux, 64-bit ARM', f'docket-{VERSION}-linux-arm64', 'Statically linked: it needs no other libraries.'),
+    ('Linux, x86-64', f'docket-{VERSION}-linux-amd64', 'Statically linked: it needs no other libraries.'),
+    ('Windows, x86-64', f'docket-{VERSION}-windows-amd64.exe', 'Never run by anyone. Untested.'),
+]
+LIMITS = [
+    'The navigation of the guide inside Docket does not follow the reader in Safari.',
+    'A commit-hook folder given relative to the project leaves the record\'s own folder without the hook.',
+    'The adoption skill still carries one line of its makers\' own practice, and by default treats a conversion as a trial run on a copy.',
+    'No agent has yet been run through a whole adoption with the adoption skill; three of its scenarios are checked as text only.',
+    'No program from this release has been started on a Mac older than macOS 27.2, or on Windows. The minimum of macOS 13.0 is what the programs say they need, read from them, not something run.',
+    'Docket\'s own pages, and the call an agent makes to report it, still call the one run of the whole suite on stage "testing together", an older name. The guide and the skills call it the suite\'s run. It is the same run.',
+    'Docket does not make the regression count. It carries no script for it and does not tie a test\'s result to the scenario the test names, so a project writes its own script, or the run says the count was not made.',
+    'Docket refuses a QA run that does not give a result for every scenario the release names. After a fix on stage, the fresh QA agent restates the scenarios it did not check again, each with a note that it stands from the earlier check.',
+    'Docket\'s pages fetch their fonts from Google\'s servers, so the program reaches the internet, and looks different without a connection.',
+    'Docket reads where a work item stands from this machine\'s own copies of development, stage and main, so it can say a feature is merged nowhere until those copies are brought up to the Git host\'s.',
+    'Two lines of advice from docket assess still say stage is reset to main after a production deployment; the method has stage stay as it is after a release.',
+]
 SHOT_SIZE = (800, 692)
 
 
@@ -43,7 +67,7 @@ STEPS = [
     ('Building', 'The feature is built on its own branch, cut from <code>docket-record</code>, so the work item and its scenarios are in the feature\'s folder from its first commit. The feature removes the <code>@wip</code> tag from the scenarios it builds, in the same commits as the code.'),
     ('Testing and code review', 'Test runs are reported against the work item, scenario by scenario or from a JUnit or Cucumber report. A code review is reported with who reviewed it, the commit read, the decision, and each finding with what was done about it.'),
     ('Merging', 'Pull requests are reported against the work item. Where it stands is then read from the merges themselves: on <code>development</code>, on <code>stage</code>, or released.'),
-    ('QA and release', 'QA of <code>stage</code> is reported as a run of its own, with a result for each scenario the release set names, never mixed with the feature\'s own tests. After the promotion and the tags, the release is reported, and Docket checks it against Git.'),
+    ('The suite, QA and release', 'The run of the whole suite on <code>stage</code> is reported against the commit it ran on, with each command and its result; Docket\'s own pages still call it testing together. QA of <code>stage</code> is reported as a run of its own, with a result for each scenario the release list names, never mixed with the feature\'s own tests. A release is marked by its two tags on <code>main</code>, and Docket reads the history of releases from them; a release can also be reported to Docket, which checks it against Git.'),
 ]
 GUARDS = [
     ('A commit hook', 'Keeps code off <code>docket-record</code> and the record off features. The one change to the record a feature may make is taking the <code>@wip</code> tag off the scenarios it builds.'),
@@ -53,18 +77,47 @@ GUARDS = [
 ]
 OWN_SKILLS = [
     ('docket-flow', 'What Docket changes in the flow', 'What Docket adds to Feature Promotion Flow in a project that keeps its record with Docket: the <code>docket-record</code> branch between <code>main</code> and a feature, where the record is written, and what is recorded at each step. An agent loads it together with the flow\'s own skills, before any Git command that changes anything, in a project that has a <code>.docket/</code> folder.'),
-    ('adopt-project', 'Adopting a project', 'Brings an existing project under Docket. It opens the conversion as work in Docket, checks that the project is safe to work in, assesses it, proposes the changes, applies them only after the project\'s owner agrees, and turns what the run met into Docket records. An agent uses it when asked to adopt a project, or when <code>docket assess</code> reports something missing.'),
+    ('adopt-project', 'Adopting a project', 'Brings an existing project under Docket. It keeps a record of the run in the project itself, checks that the project is safe to work in, assesses it, proposes the changes, applies them only after the project\'s owner agrees, and tells the owner what the run met. An agent uses it when asked to adopt a project, or when <code>docket assess</code> reports something missing.'),
 ]
 START = [
     ('Assess the project', '<code>docket assess &lt;folder&gt;</code> reports what adopting the project would involve: what is in place, what is missing, and what waits on a decision. It changes nothing.'),
-    ('Adopt it', 'The adoption skill proposes the changes, and applies them only after the project\'s owner agrees: <code>.docket/config.yaml</code>, the <code>docket-record</code> branch and its folder, a section in the instructions for agents, the agent connection and the commit hook.'),
+    ('Adopt it', 'The adoption skill proposes the changes, and applies them only after the project\'s owner agrees: <code>.docket/config.yaml</code>, the <code>docket-record</code> branch and its folder, a section in the instructions for agents, the agent connection and the commit hook. It takes each template, the hook and the schemas from the program, with <code>docket carries</code>.'),
     ('Serve it', '<code>docket serve</code>, from any folder of the project, finds the folder where <code>docket-record</code> is checked out and serves it on the project\'s own port. <code>docket ports</code> lists the projects served on the machine.'),
     ('Connect an agent', 'An agent connects to Docket at <code>/mcp</code> on the same address. For Claude Code: <code>claude mcp add --transport http docket http://127.0.0.1:&lt;port&gt;/mcp</code>.'),
 ]
 
 
+def get_docket():
+    """Where to download Docket, how to check the download, and how to run it the first time."""
+    rows = ''.join(f'<tr><td>{esc(sysname)}</td><td><a href="{RELEASE.replace('/tag/', '/download/')}/{esc(f)}"><code>{esc(f)}</code></a></td><td>{esc(note)}</td></tr>' for sysname, f, note in FILES)
+    mac = f'docket-{VERSION}-darwin-arm64'
+    return (f'<p class="say">Docket is one program file, with nothing else to install. Download the file for your system from the release <a href="{RELEASE}" target="_blank" rel="noopener">docket-{VERSION}</a>, check it, make it runnable, and put it where your shell finds it, named <code>docket</code>: the adoption skill and <code>docket assess</code> give commands that begin with <code>docket</code>. Docket also needs Git installed and on your <code>PATH</code>: it reads the repository by running <code>git</code>, and without it cannot read a project.</p>'
+            f'<div class="tablewrap"><table class="setup"><thead><tr><th>System</th><th>File</th><th>Note</th></tr></thead><tbody>{rows}</tbody></table></div>'
+            '<h3 class="sk">Check the download</h3>'
+            f'<p>Download <code>docket-{VERSION}-checksums.txt</code> from the same release into the same folder, then:</p>'
+            f'<pre class="cmd">shasum -a 256 -c --ignore-missing docket-{VERSION}-checksums.txt</pre>'
+            '<p>It should say OK for each file you downloaded. On Linux, <code>sha256sum -c --ignore-missing</code> does the same.</p>'
+            '<h3 class="sk">The first run on macOS</h3>'
+            '<p>The macOS programs are not signed by Apple and not notarised, and macOS blocks a program from the web that is not. These commands make the file runnable, clear the block, and run it:</p>'
+            f'<pre class="cmd">chmod +x {mac}\nxattr -d com.apple.quarantine {mac}\n./{mac} version</pre>'
+            f'<p>The last line prints <code>{VERSION}</code>. If your browser did not mark the file, the second prints <code>No such xattr: com.apple.quarantine</code>: that is not an error, there was nothing to clear. For an Intel Mac, use the <code>darwin-amd64</code> file the same way.</p>'
+            '<h3 class="sk">On Linux</h3>'
+            f'<pre class="cmd">chmod +x docket-{VERSION}-linux-amd64\n./docket-{VERSION}-linux-amd64 version</pre>'
+            '<h3 class="sk">Putting it on your path</h3>'
+            '<p>Move the file you downloaded there, named <code>docket</code>. For the Apple silicon program:</p>'
+            f'<pre class="cmd">sudo mv {mac} /usr/local/bin/docket\ndocket version</pre>'
+            '<p>For any other system, put the name of the file you downloaded in place of the first name, such as '
+            f'<code>docket-{VERSION}-linux-amd64</code> on Linux on x86-64. <code>/usr/local/bin</code> belongs to the system, hence <code>sudo</code>. A folder on your <code>PATH</code> that you own, such as <code>~/bin</code>, needs none.</p>'
+            '<h3 class="sk">Windows</h3>'
+            '<p>The Windows program is offered as built, but no one has yet run it. The command Docket gives to install its commit hook is written for a Unix shell.</p>'
+            '<h3 class="sk">Licence</h3>'
+            '<p>The program is under the MIT License, copyright (c) 2026 Lucidex Group. The skills and the guide it carries are under CC BY 4.0. The names Docket, Feature Promotion Flow and Lucidex Group are not licensed beyond credit. The release carries the licence and the notices of what Docket is built with, and <code>docket licence</code> prints them.</p>'
+            '<p class="note"><b>Known limits.</b> Recorded in Docket\'s own backlog, and taken off this list as each is fixed:</p>'
+            '<ul class="limits">' + ''.join(f'<li>{esc(x)}</li>' for x in LIMITS) + '</ul>')
+
+
 def doc():
-    pages_intro = ('<p class="note shotnote"><b>About the screenshots.</b> They are of Docket built from its development branch on November 23, 2026, serving a small made-up project, a lending library, written for this guide. '
+    pages_intro = (f'<p class="note shotnote"><b>About the screenshots.</b> They are of Docket {VERSION}, the released program, serving a small made-up project, a lending library, written for this guide. '
                    'No real project\'s record is shown. Choose a screenshot to open it full size.</p>')
     parts = [
         ('What Docket is', 'For a person deciding whether to put a project on Docket.', [
@@ -77,8 +130,8 @@ def doc():
             ('works', 'How it works', cards(WORKS, 'gives two')),
             ('not', 'What it is not',
              '<p class="say">Docket is not a hosted service. It has no sign-in and no database shared between users, and it does not deploy anything.</p>'
-             '<p class="note">It is in active development and is not yet in production. A project on Docket can be worked on without it, because every step is plain Git and the record is plain files.</p>'
-             '<p class="note"><b>The repository.</b> Docket is not yet published. Its repository will be linked here when it is.</p>'),
+             '<p class="note">Docket is in active development. Its commands, and what an agent\'s calls return, can change between releases without notice. A project on Docket can be worked on without it, because every step is plain Git and the record is plain files.</p>'
+             f'<p class="note"><b>Getting it.</b> Docket\'s source is not public. The program itself is published, for macOS, Linux and Windows: see <a href="#get">Get Docket</a>.</p>'),
         ]),
         ('Its pages', 'What a person sees, page by page.', [
             ('layout', 'How the pages are arranged',
@@ -86,8 +139,8 @@ def doc():
              '<p class="note">Everything in the backlog opens where it is, in the Work table: choose a row and it unfolds beneath itself, with what can be done to it.</p>'),
             ('work-item', 'A work item',
              '<p class="say">A work item, opened in the Work table, shows where it stands, how it got there and what it was tested against.</p>'
-             + shot('work-item', 'A work item opened in Docket\'s Work table, Borrowing at the desk: its effort and budget, its status done and released, buttons to accept it or object, and its line of stamped times.',
-                    '<b>A work item, done and released.</b> Its effort against its estimate and budget, with hours a person can add. Its status, and beside it "Released", read from the merges. A person accepts the work or objects and reopens it. Below, the line of its times, each stamped by Docket\'s server.')
+             + shot('work-item', 'A work item opened in Docket\'s Work table, Borrowing at the desk: its effort and budget, its status done, released and accepted, a button to object and reopen it, and its line of stamped times.',
+                    '<b>A work item, done, released and accepted.</b> Its effort against its estimate and budget, with hours a person can add. Its status, and beside it "Released", read from the merges. Under it, Docket says why it counts as accepted: \u201cAn agent reported it done, and that work and its record are committed and pushed.\u201d A person can still object and reopen it. Below, the line of its times, each stamped by Docket\'s server.')
              + shot('work-item-tests', 'Further down the same work item: the story it delivers, each scenario with its text and a passing test result, and what it was tested against.',
                     '<b>Further down: its scenarios and tests.</b> The story it delivers, and each scenario with its words and its latest result, who ran it and when. When the work item was set to done, what it was tested against was frozen, so it does not change when a scenario does later.')),
             ('use-case', 'A use case and its stories',
@@ -108,8 +161,8 @@ def doc():
                     '<b>A release.</b> The pull request that promoted it, its two tags, the work items it brought and the pull request of each, the commit QA tested, what was verified, and who accepted it. Docket checked against Git that the commit, the tags and the merges are where the agent said; the rest is as the agent stated it, and the page says which is which.')),
             ('guide', 'The guide inside Docket',
              '<p class="say">Docket carries its own guide to what a project on it has to be, and to Feature Promotion Flow, for a person on the Guide page and for an agent when it connects.</p>'
-             + shot('guide', 'The Guide page inside Docket, opening with what using Docket commits a project to.',
-                    '<b>The guide.</b> The same text is given to a person here, to an agent through its connection, and at a terminal with <code>docket guide</code>.')),
+             + shot('guide', 'The Guide page inside Docket: one guide in eight parts, each a page of its own, with its contents in the navigation on the left.',
+                    '<b>The guide.</b> One guide in eight parts, from what a project on Docket has to be to who decides what, each a page of its own, with its contents in the navigation on the left. The same text is given to a person here, to an agent through its connection, and at a terminal: <code>docket guide</code> lists its parts, and <code>docket guide &lt;part&gt;</code> gives one.')),
         ]),
         ('How Docket runs the flow', 'What Docket records and checks at each step of Feature Promotion Flow.', [
             ('record-branch', 'The record has its own branch',
@@ -120,9 +173,10 @@ def doc():
             ('its-skills', 'Its own skills',
              '<p class="say">Docket installs five of the flow\'s skills as the standards write them, each with a note that a project on Docket reads it together with <code>docket-flow</code>, which governs where they differ, and two of its own. Setting a project up is done by its own adoption skill, in place of the flow\'s. The flow\'s skills are in the <a href="#s-overview">Skills</a> tab; Docket\'s own two are these.</p>'
              + '<ul class="gives two">' + ''.join(f'<li><h3>{esc(t)}</h3><p class="skillname">The skill <code>{esc(n)}</code></p><p>{d}</p></li>' for n, t, d in OWN_SKILLS) + '</ul>'
-             + '<p class="note">Docket is not yet published, so the text of these two skills is not shown here. It comes with Docket, and <code>docket skills install</code> writes it into a project.</p>'),
+             + '<p class="note">The text of these two skills is not shown here. It comes with the program: <code>docket skills</code> lists the skills it carries, and <code>docket skills install</code> writes them into a project. It says each file it will write and asks first, and leaves a skill that differs alone unless told to replace it.</p>'),
         ]),
-        ('Getting started', 'Putting a project on Docket.', [
+        ('Getting started', 'Getting Docket, and putting a project on it.', [
+            ('get', 'Get Docket', get_docket()),
             ('start', 'From a project to a project on Docket', cards(START, 'gives two')
              + '<p class="note">What adopting adds to a project, and what using Docket commits it to, are in the second tab: <a href="#d-adds">What Docket adds to a project</a>.</p>'),
         ]),
@@ -131,6 +185,6 @@ def doc():
         'title': 'Docket',
         'lede': 'The program that keeps a project\'s record in its own repository, and runs Feature Promotion Flow: what it does, what it looks like, and how it runs the flow.',
         'intro': 'Docket keeps everything a software project creates as files in the project\'s own repository, and shows that record as pages to a person and through a connection to an agent. It reads where each piece of work stands from the merges in Git, so what it shows is the history, not what someone remembered to set.',
-        'repo': 'Docket is not yet published. Its repository will be linked here when it is.',
+        'repo': f'Docket\'s source is not public. Its programs are published as the release docket-{VERSION} of Lucidex-Group/feature-promotion-flow.',
         'parts': parts,
     }

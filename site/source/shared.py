@@ -4,29 +4,29 @@ from drawing import *
 
 # A feature fails on stage ------------------------------------------------------
 def fails(noted='The failure is recorded against feature C, with the step that caught it and its kind.'):
-    f = Fig(1100, 350, 'Three features are merged into stage and one fails. Stage is not left standing. Usually the feature comes out: stage is reset to main, the candidate is built again from the other two, they are merged again, and stage is verified again.')
+    f = Fig(1100, 350, 'Three features are merged into stage and one fails. Stage is not left standing. Usually the feature comes out: stage is reset to main, the other two are merged again, and the suite is run on stage again.')
     A, B, C, S, M = 52, 104, 156, 236, 304
     f.lane('feat', A, [(X0, 650)], 'feature A')
     f.lane('feat', B, [(X0, 720)], 'feature B')
     f.lane('feat', C, [(X0, 388)], 'feature C')
     f.lane('stage', S, [(X0, 560)])
     f.lane('main', M)
-    f.step('The release set, already tested together as a candidate, is merged into stage, one pull request for each feature.')
+    f.step('The release list is merged into stage, one pull request for each feature, and the whole suite is run on stage, once.')
     for i, y in enumerate((A, B, C)):
         x = 248 + 70 * i
         f.link('feat', x, y, x + 50, S); f.dot('stage', x + 50, S, 'm')
-    f.step('Feature C fails when stage is verified. stage is not left standing with a known fault. ' + noted)
+    f.step('Feature C fails, in the suite\'s run on stage or in QA. stage is not left standing with a known fault. ' + noted)
     f.dot('stage', 500, S, 'x'); f.label(500, S - 20, 'C fails', strong=True)
     f.step('Usually the feature comes out, as drawn here: stage is reset to main. This does not wait for a separate word. The failed feature is not backed out, and nothing is patched on stage. Where the fault is small and the feature is fixed quickly on its own branch, it may be merged again on top by pull request, and stage is not reset.')
     f.lane('stage', S, [(606, 1076)], pill=False)
     f.link('main', 556, M, 606, S, dash=True); f.dot('stage', 606, S, 'c')
     f.label(590, M + 24, 'stage is reset to main')
-    f.step('The candidate is built again from A and B, and the whole suite is run on it. Then A and B are merged into stage again from their own branches, in the same order, and stage is checked against the candidate.')
+    f.step('A and B are merged into stage again from their own branches, each by its own pull request, in the order they first went into development. Nothing is built or run anywhere first.')
     f.link('feat', 650, A, 700, S); f.dot('stage', 700, S, 'm')
     f.link('feat', 720, B, 770, S); f.dot('stage', 770, S, 'm')
     f.label(735, S + 28, 'the rest, merged again')
-    f.step('Either way stage has changed, so it is verified again, by a fresh agent. C is fixed on its own branch, the fix is code reviewed there, and C is merged into development again. Once fixed, it may go back into the set.')
-    f.dot('stage', 850, S, 'q'); f.label(850, S - 20, 'verified again')
+    f.step('Either way stage has changed, so the whole suite is run on it again. After a feature comes off, QA\'s results for the features that remain stand. After a fix, a fresh agent checks again the scenarios of the feature that changed and what its fix touched. C is fixed on its own branch, tested, code reviewed where the fix is to a defect or a risk, and merged into development again. Once fixed, it may go back on the list.')
+    f.dot('stage', 850, S, 'q', tip='The whole suite is run on stage again, because stage has changed.'); f.label(850, S - 20, 'the suite, run again')
     f.label(400, C - 16, 'goes back to be fixed', 'start')
     return f
 
@@ -54,33 +54,6 @@ def comeout():
     f.link('feat', 660, A, 710, D); f.dot('dev', 710, D, 'm')
     f.link('feat', 730, B, 780, D); f.dot('dev', 780, D, 'm')
     f.label(745, D + 28, 'the rest, merged again')
-    return f
-
-
-# Testing the release set before stage is built -------------------------------------
-def candidate(pulled='the record'):
-    f = Fig(1100, 372, 'A candidate is built on a machine from main plus the release set and the suite is run on it. Stage is then built from the same features in the same order, and the two are compared.')
-    A, C, K, S, M = 56, 108, 182, 252, 322
-    f.lane('feat', A, [(X0, 720)], 'feature A'); f.lane('feat', C, [(X0, 790)], 'feature C')
-    f.lane('stage', S); f.lane('main', M)
-    for x, y in ((204, A), (216, C)):
-        f.dot('feat', x, y)
-    f.step('The maintainer has chosen the set, and each feature of it has pulled ' + pulled + ' and been pushed. A candidate is built on a machine, in a folder of its own: main as it is on GitHub, plus the set, merged in release order. It is never pushed. A conflict between two features is resolved in the merge, and the merge resolves nothing else, so the same resolution is replayed when the set is merged into stage.')
-    f.link('main', 232, M, 290, K, tip='The candidate starts from main as it is on GitHub, in a folder of its own.', cmd='git fetch origin\ngit worktree add --detach ~/Development/worktrees/<Project>/candidate origin/main')
-    f.lane('mrg', K, [(290, 640)], 'candidate')
-    f.link('feat', 322, A, 372, K, tip='Feature A is merged into the candidate, in release order.', cmd='git merge --no-ff origin/feature/<first> -m "Merge branch \'feature/<first>\' into candidate"'); f.dot('mrg', 372, K, 'm')
-    f.link('feat', 398, C, 440, K, tip='Feature C is merged into the candidate, in release order.', cmd='git merge --no-ff origin/feature/<second> -m "Merge branch \'feature/<second>\' into candidate"'); f.dot('mrg', 440, K, 'm')
-    f.label(300, K + 28, 'main plus the set, never pushed', 'start')
-    f.step('The project\'s whole suite is run on the candidate: on the assembled set, not after each merge, and again whenever the set changes. A feature that breaks the set is left out, or fixed on its own branch, code reviewed there and merged into development again. The candidate is then built again, as many times as it takes, which costs nothing on GitHub.')
-    f.dot('mrg', 520, K, 'q', tip='The project\'s whole suite is run on the candidate, on the assembled set.')
-    f.label(520, K - 20, 'the suite passes')
-    f.step('stage is built: the same features, merged one by one in the same order, each by its own pull request.')
-    f.link('feat', 720, A, 776, S); f.dot('stage', 776, S, 'm')
-    f.link('feat', 790, C, 846, S); f.dot('stage', 846, S, 'm')
-    f.step('stage is checked against the candidate, tree against tree. The merge commits differ; if the trees are identical, the pass on the candidate is evidence about what stage holds. QA on stage is its independent confirmation.')
-    f.link('mrg', 640, K, 930, S, dash=True, tip='The contents are compared, tree against tree. If they differ, say so before QA starts and find out why.', cmd='git fetch origin\ngit rev-parse origin/stage^{tree}\ngit rev-parse HEAD^{tree}   # in the candidate\'s folder')
-    f.dot('stage', 930, S, 'c')
-    f.label(944, S - 18, 'the same contents', 'start', True)
     return f
 
 
@@ -214,7 +187,7 @@ def conflict():
     f.step('The feature is merged into the merge branch, and the conflict is resolved in that merge. The merge resolves the conflict and nothing else. The feature itself is not changed.')
     f.link('feat', 560, X, 624, Mg); f.dot('mrg', 624, Mg, 'q')
     f.label(640, X + 36, '3  the feature is merged in, and\nthe conflict is resolved here', 'start')
-    f.step('The pull request is opened from the merge branch and merged. With recorded resolutions turned on, Git replays the resolution if the same conflict comes up on stage or after a reset.')
+    f.step('The pull request is opened from the merge branch and merged. With recorded resolutions turned on, Git replays the resolution if the same conflict comes up on stage or after a reset, in the clone that recorded it.')
     f.link('mrg', 790, Mg, 852, D); f.dot('dev', 852, D, 'm')
     f.label(866, Mg + 28, '4  the pull request is\nopened from this branch', 'start')
     return f
@@ -222,7 +195,6 @@ def conflict():
 
 MERGEONLY = [
     ('coord', 'Coordination branch', 'coordination/<id>-<name>', 'Features that require each other are built and tested together.', 'Never merged anywhere'),
-    ('mrg', 'Candidate', 'a detached folder, never pushed', 'The release set is built and tested together before stage is built, and stage is checked against it.', 'Never merged anywhere'),
     ('mrg', 'Merge branch', 'merge/<feature id>-into-<branch>', 'A conflict is resolved without changing the feature.', 'Merged into development or stage by pull request'),
 ]
 
@@ -234,7 +206,7 @@ def mergeonly():
 
 
 WHO3 = [
-    ('The maintainer', 'Decides what is released: chooses the release set, answers code review findings, gives the word to promote, and authorises resets, tags and repository settings.'),
+    ('The maintainer', 'Decides what is released: names the release list, answers code review findings, gives the word to promote, and authorises resets, tags and repository settings.'),
     ('The product owner', 'Decides what is built: orders the backlog, agrees stories and scenarios, and accepts decisions about how the product behaves.'),
     ('The user', 'The person directing the work in the conversation: the one an agent asks, whose word governs, and under whose name commits are made.'),
 ]

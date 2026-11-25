@@ -143,7 +143,41 @@ def a_zip_can_be_made():
         return 'the unpacked zip is not a valid plugin' if done.returncode else ''
 
 
+def the_docket_tab_stops_on_what_it_does_not_know():
+    """The second tab is built from Docket's pinned guide; a part, a section or a link it does not know must stop the build, naming it."""
+    import copy, importlib, json
+    sys.path.insert(0, os.path.join(ROOT, 'site', 'source'))
+    docket = importlib.import_module('docket')
+    real = json.load(open(docket.GUIDE))
+    def unknown_section(d):
+        d['parts'][2]['sections'][1]['id'] = 'a-section-no-one-mapped'
+        return 'a-section-no-one-mapped'
+    def unknown_link(d):
+        s = d['parts'][2]['sections'][1]
+        s['html'] = s['html'].replace('</section>', '<a href="#/guide/nowhere">x</a></section>', 1)
+        return '#/guide/nowhere'
+    def missing_part(d):
+        d['parts'] = [p for p in d['parts'] if p['name'] != 'mistakes']
+        return 'mistakes'
+    problems = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for change in (unknown_section, unknown_link, missing_part):
+            d = copy.deepcopy(real)
+            named = change(d)
+            path = os.path.join(tmp, 'guide.json')
+            json.dump(d, open(path, 'w'))
+            docket.GUIDE = path
+            try:
+                docket.doc()
+                problems.append(f'{change.__name__.replace("_", " ")}: the tab was built')
+            except SystemExit as stop:
+                if named not in str(stop):
+                    problems.append(f'{change.__name__.replace("_", " ")}: it stopped without naming {named}')
+    return '; '.join(problems)
+
+
 check('The site builds, with no place named twice, no link that leads nowhere and no image missing', the_site_builds())
+check('The tab built from Docket\'s guide stops the build, naming what it does not know: a section, an in-app link, a missing part', the_docket_tab_stops_on_what_it_does_not_know())
 check('Switching tabs leads to the same place, the same part, or the overview, as the guide says', switching_tabs_leads_where_it_should())
 check('The package is a valid plugin, and the repository a valid marketplace', the_plugin_is_valid())
 check('Every skill loads: a name matching its folder and a description that says when to use it', every_skill_loads())
