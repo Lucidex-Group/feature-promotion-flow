@@ -18,9 +18,9 @@ DOES = {
     'feature-promotion-flow': ('The method: branches, merges, who may do what, and the names of the checks', 'The method itself: which branches there are, what is cut from what, how merges are made, who may do what without asking, and what each check is called. The other five skills are its procedures, and each starts by loading it.'),
     'fpf-set-up-project': ('Sets a repository up for the flow, once', 'Gets a repository ready once: creates development and stage from main, allows merge commits only, protects the three branches, sets up the clone, and lists what the project\'s own instruction file has to say.'),
     'fpf-start-feature': ('Starts a piece of work on its own branch and folder', 'Checks that a piece of work is ready to build, then cuts its branch from main, named for the work, in a folder of its own.'),
-    'fpf-build-to-development': ('Code reviews a feature and merges it into development', 'Takes a feature from passing tests to development: a code review by an agent that did not write it, each finding classified and dealt with, the merge by pull request, and testing with the other features. It also says when a feature is eligible for stage.'),
-    'fpf-release': ('Makes a release, from the chosen set to the tags', 'Makes a release from the features the maintainer chooses: a candidate tested on a machine, the set merged into stage by pull request, QA by a fresh agent, and on the maintainer\'s word the promotion, the tags, and the release brought back into development.'),
-    'fpf-hotfix': ('Releases a fix that cannot wait', 'Releases a fix that cannot wait for the next release: cut from main, code reviewed, sent alone through stage and QA, then promoted and brought back into development.'),
+    'fpf-build-to-development': ('Tests a feature, code reviews it, and merges it into development', 'Takes a feature from written code to development: it pulls main and runs its own tests, has its code reviewed by an agent that did not write it, with each finding classified and dealt with, and is merged by pull request, with nothing run on development. It also says when a feature is eligible for stage.'),
+    'fpf-release': ('Makes a release, from the release list to the tags', 'Makes a release from the features on the maintainer\'s release list: the list checked against the bar for stage, stage built from it by pull request, the whole suite run there once, QA by a fresh agent, and on the maintainer\'s word the promotion, the tags, and the release brought back into development.'),
+    'fpf-hotfix': ('Releases a fix that cannot wait', 'Releases a fix that cannot wait for the next release: cut from main, tested and code reviewed, sent alone to stage, where the suite is run and QA checks it, then promoted and brought back into development.'),
 }
 # The title each skill's section goes by, in plain words; the skill's own name stands under it.
 TITLES = {
@@ -34,7 +34,7 @@ TITLES = {
 PARTS = [
     ('The method', 'The skill an agent loads before any Git command that changes anything.', ['feature-promotion-flow']),
     ('Setting up and starting', 'Once for a project, and once for each piece of work.', ['fpf-set-up-project', 'fpf-start-feature']),
-    ('Building and releasing', 'From a feature\'s passing tests to a release, and the fix that cannot wait.', ['fpf-build-to-development', 'fpf-release', 'fpf-hotfix']),
+    ('Building and releasing', 'From a feature\'s written code to a release, and the fix that cannot wait.', ['fpf-build-to-development', 'fpf-release', 'fpf-hotfix']),
 ]
 
 
