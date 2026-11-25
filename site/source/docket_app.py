@@ -1,6 +1,6 @@
 """The third tab: Docket, the application. What it is, what it does, what it looks like, and how it runs Feature Promotion Flow.
 
-The screenshots are files in site/images/docket/, taken of Docket v0.11.1, the released program, on November 23, 2026,
+The screenshots are files in site/images/docket/, taken of Docket v0.13.0, the released program, on November 24, 2026,
 serving a made-up project, a lending library, written for this guide, with a remote of its own. Each page was reached by
 clicking through the app.
 """
@@ -8,7 +8,7 @@ from html import escape as esc
 
 SHOTS = 'images/docket/'
 # The Docket release this tab describes, and where its files are published.
-VERSION = 'v0.11.1'
+VERSION = 'v0.13.0'
 RELEASE = f'https://github.com/Lucidex-Group/feature-promotion-flow/releases/tag/docket-{VERSION}'
 FILES = [
     ('macOS, Apple silicon', f'docket-{VERSION}-darwin-arm64', 'macOS 13.0 or later. Not signed by Apple, not notarised.'),
@@ -23,6 +23,12 @@ LIMITS = [
     'The adoption skill still carries one line of its makers\' own practice, and by default treats a conversion as a trial run on a copy.',
     'No agent has yet been run through a whole adoption with the adoption skill; three of its scenarios are checked as text only.',
     'No program from this release has been started on a Mac older than macOS 27.2, or on Windows. The minimum of macOS 13.0 is what the programs say they need, read from them, not something run.',
+    'Docket\'s own pages, and the call an agent makes to report it, still call the one run of the whole suite on stage "testing together", an older name. The guide and the skills call it the suite\'s run. It is the same run.',
+    'Docket does not make the regression count. It carries no script for it and does not tie a test\'s result to the scenario the test names, so a project writes its own script, or the run says the count was not made.',
+    'Docket refuses a QA run that does not give a result for every scenario the release names. After a fix on stage, the fresh QA agent restates the scenarios it did not check again, each with a note that it stands from the earlier check.',
+    'Docket\'s pages fetch their fonts from Google\'s servers, so the program reaches the internet, and looks different without a connection.',
+    'Docket reads where a work item stands from this machine\'s own copies of development, stage and main, so it can say a feature is merged nowhere until those copies are brought up to the Git host\'s.',
+    'Two lines of advice from docket assess still say stage is reset to main after a production deployment; the method has stage stay as it is after a release.',
 ]
 SHOT_SIZE = (800, 692)
 
@@ -61,7 +67,7 @@ STEPS = [
     ('Building', 'The feature is built on its own branch, cut from <code>docket-record</code>, so the work item and its scenarios are in the feature\'s folder from its first commit. The feature removes the <code>@wip</code> tag from the scenarios it builds, in the same commits as the code.'),
     ('Testing and code review', 'Test runs are reported against the work item, scenario by scenario or from a JUnit or Cucumber report. A code review is reported with who reviewed it, the commit read, the decision, and each finding with what was done about it.'),
     ('Merging', 'Pull requests are reported against the work item. Where it stands is then read from the merges themselves: on <code>development</code>, on <code>stage</code>, or released.'),
-    ('QA and release', 'QA of <code>stage</code> is reported as a run of its own, with a result for each scenario the release set names, never mixed with the feature\'s own tests. After the promotion and the tags, the release is reported, and Docket checks it against Git.'),
+    ('The suite, QA and release', 'The run of the whole suite on <code>stage</code> is reported against the commit it ran on, with each command and its result; Docket\'s own pages still call it testing together. QA of <code>stage</code> is reported as a run of its own, with a result for each scenario the release list names, never mixed with the feature\'s own tests. A release is marked by its two tags on <code>main</code>, and Docket reads the history of releases from them; a release can also be reported to Docket, which checks it against Git.'),
 ]
 GUARDS = [
     ('A commit hook', 'Keeps code off <code>docket-record</code> and the record off features. The one change to the record a feature may make is taking the <code>@wip</code> tag off the scenarios it builds.'),
