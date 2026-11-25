@@ -31,4 +31,4 @@ The rules for it:
 
 Two kinds of branch hold merges and no work of their own, and differ in where they end: the coordination branch, which is never merged anywhere; and the `merge/<feature id>-into-<branch>` branch made to resolve a conflict, which exists to be merged into `development` or `stage` by pull request.
 
-Drawn from Lucidex Group's development standards, as they stood on November 22, 2026.
+Drawn from Lucidex Group's development standards, as they stood on November 24, 2026.
