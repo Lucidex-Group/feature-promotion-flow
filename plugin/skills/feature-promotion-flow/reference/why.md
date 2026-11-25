@@ -57,4 +57,4 @@ A feature never takes anything from `development` or `stage`, and a feature that
 
 The method says nothing about database migrations, or about fixing an older version while a newer one is out. It does not say how a release is deployed, and its rollback assumes the previous release can be deployed again. It does not say where a project keeps its backlog, its decisions or its code reviews: that is the project's to state.
 
-Drawn from Lucidex Group's development standards, as they stood on November 22, 2026.
+Drawn from Lucidex Group's development standards, as they stood on November 24, 2026.

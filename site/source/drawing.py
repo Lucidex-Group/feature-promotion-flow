@@ -183,9 +183,9 @@ class Loop(Fig):
         x, y = self.pt(t, r)
         self.txt.append(self.g(f'<g class="nb"><circle cx="{x}" cy="{y}" r="9.5"/><text x="{x}" y="{y + 3.8}" text-anchor="middle">{n}</text></g>'))
 
-    def rdot(self, cls, t, r, kind='c'):
+    def rdot(self, cls, t, r, kind='c', tip=None):
         x, y = self.pt(t, r)
-        self.dot(cls, x, y, kind, own=('r', r))
+        self.dot(cls, x, y, kind, tip=tip, own=('r', r))
 
     def out(self, t, text, r=342):
         (x1, y1), (x2, y2), (x, y) = self.pt(t, r - 10), self.pt(t, r + 2), self.pt(t, r + 12)
