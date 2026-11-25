@@ -1,6 +1,6 @@
 # Feature Promotion Flow
 
-Feature Promotion Flow (FPF) is a way of branching and releasing with Git. Each feature is built on its own branch, cut from `main`. Features are merged into `development` to be tested together. A release is assembled on `stage` from the features chosen for it, verified there, and promoted to `main`. Being on `development` says nothing about release: the release set is chosen, feature by feature.
+Feature Promotion Flow (FPF) is a way of branching and releasing with Git. Each feature is built on its own branch, cut from `main`. Features are merged into `development`, where their conflicts show. A release is built on `stage` from the features the maintainer lists for it, tested and checked there, and promoted to `main`. Being on `development` says nothing about release: the release list is named, feature by feature.
 
 This repository holds the guide to the method and a package of skills for an agent working by it.
 

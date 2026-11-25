@@ -7,8 +7,8 @@ Six skills for an agent working in a project that uses Feature Promotion Flow, a
 | `feature-promotion-flow` | Before any Git command that changes anything. The method: the branches, what is cut from what, how merges are made, who may do what, and what each check is called. |
 | `fpf-set-up-project` | Once, when a project starts or adopts the flow. |
 | `fpf-start-feature` | Beginning a piece of work that is ready. |
-| `fpf-build-to-development` | A feature's tests pass, a code review comes back, or `development` breaks. |
-| `fpf-release` | Choosing a release set, building a candidate, assembling `stage`, promoting. |
+| `fpf-build-to-development` | A feature's code is written, its tests pass, or a code review comes back. |
+| `fpf-release` | Checking the release list, building `stage` from it, the suite's run and QA there, promoting. |
 | `fpf-hotfix` | A fix that cannot wait for the next release. |
 
 ## Installing
