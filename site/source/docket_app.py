@@ -77,7 +77,7 @@ GUARDS = [
 ]
 OWN_SKILLS = [
     ('docket-flow', 'What Docket changes in the flow', 'What Docket adds to Feature Promotion Flow in a project that keeps its record with Docket: the <code>docket-record</code> branch between <code>main</code> and a feature, where the record is written, and what is recorded at each step. An agent loads it together with the flow\'s own skills, before any Git command that changes anything, in a project that has a <code>.docket/</code> folder.'),
-    ('adopt-project', 'Adopting a project', 'Brings an existing project under Docket. It opens the conversion as work in Docket, checks that the project is safe to work in, assesses it, proposes the changes, applies them only after the project\'s owner agrees, and turns what the run met into Docket records. An agent uses it when asked to adopt a project, or when <code>docket assess</code> reports something missing.'),
+    ('adopt-project', 'Adopting a project', 'Brings an existing project under Docket. It keeps a record of the run in the project itself, checks that the project is safe to work in, assesses it, proposes the changes, applies them only after the project\'s owner agrees, and tells the owner what the run met. An agent uses it when asked to adopt a project, or when <code>docket assess</code> reports something missing.'),
 ]
 START = [
     ('Assess the project', '<code>docket assess &lt;folder&gt;</code> reports what adopting the project would involve: what is in place, what is missing, and what waits on a decision. It changes nothing.'),
@@ -89,7 +89,7 @@ START = [
 
 def get_docket():
     """Where to download Docket, how to check the download, and how to run it the first time."""
-    rows = ''.join(f'<tr><td>{esc(sysname)}</td><td><code>{esc(f)}</code></td><td>{esc(note)}</td></tr>' for sysname, f, note in FILES)
+    rows = ''.join(f'<tr><td>{esc(sysname)}</td><td><a href="{RELEASE.replace('/tag/', '/download/')}/{esc(f)}"><code>{esc(f)}</code></a></td><td>{esc(note)}</td></tr>' for sysname, f, note in FILES)
     mac = f'docket-{VERSION}-darwin-arm64'
     return (f'<p class="say">Docket is one program file, with nothing else to install. Download the file for your system from the release <a href="{RELEASE}" target="_blank" rel="noopener">docket-{VERSION}</a>, check it, make it runnable, and put it where your shell finds it, named <code>docket</code>: the adoption skill and <code>docket assess</code> give commands that begin with <code>docket</code>. Docket also needs Git installed and on your <code>PATH</code>: it reads the repository by running <code>git</code>, and without it cannot read a project.</p>'
             f'<div class="tablewrap"><table class="setup"><thead><tr><th>System</th><th>File</th><th>Note</th></tr></thead><tbody>{rows}</tbody></table></div>'
