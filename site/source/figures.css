@@ -225,8 +225,8 @@ cite{display:block;margin-top:6px;font:600 11.5px var(--mono);font-style:normal;
 figure.following svg [data-s]{opacity:.3}
 figure.following svg [data-b].on{opacity:1}
 .c-coord{--c:var(--l-coord)}
-.gives.six{grid-template-columns:repeat(3,1fr)}
-.gives.six li{border-top:3px solid var(--l-stage)}
+.gives.six,.gives.five{grid-template-columns:repeat(3,1fr)}
+.gives.six li,.gives.five li{border-top:3px solid var(--l-stage)}
 .gives{grid-template-columns:repeat(3,1fr)}
 .note{margin:0;max-width:86ch;font-size:14px;line-height:1.6;color:var(--muted)}
 .note b{color:var(--text)}
@@ -235,8 +235,8 @@ td b{font-weight:600}
 td code{font-size:11.5px;white-space:normal;overflow-wrap:anywhere}
 tr[class^="c-"] td:first-child{border-left:3px solid var(--c)}
 .rules{grid-template-columns:repeat(3,1fr)}
-@media (max-width:980px){.gives,.gives.six{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:520px){.gives,.gives.six{grid-template-columns:1fr}}
+@media (max-width:980px){.gives,.gives.six,.gives.five{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.gives,.gives.six,.gives.five{grid-template-columns:1fr}}
 .part{display:flex;flex-direction:column;gap:6px;border-top:2px solid var(--text);padding-top:18px;margin-top:8px}
 .part span{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .part h2{font:700 clamp(28px,3.6vw,38px)/1.1 var(--head);letter-spacing:-.015em}
@@ -265,6 +265,7 @@ table.two td:last-child{color:var(--muted);font-size:14px}
 .nb circle{fill:var(--solid)}
 .nb text{font:600 10.5px var(--mono);fill:var(--on-solid)}
 table.src td:first-child{width:34%}
+table.testing td:first-child{width:20%;color:var(--text)}
 table.src td:last-child{width:22%}
 table.src a{color:var(--accent)}
 .st{font:600 11px var(--mono);color:var(--dim)}

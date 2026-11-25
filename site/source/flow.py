@@ -1,6 +1,6 @@
 """Feature Promotion Flow on its own: the words, figures and tables for a project that does not use Docket.
 
-Written from Lucidex Group's development standards as they stood on November 22, 2026.
+Written from Lucidex Group's development standards as they stood on November 24, 2026.
 It follows the guide kept with Docket section by section, so the two can be read side by side.
 """
 import drawing
@@ -11,8 +11,8 @@ NAMES = {'dev': 'development', 'stage': 'stage', 'main': 'main', 'hot': 'hotfix'
 
 BR_TIP = {
     'feat': 'A feature branch: one piece of work, cut from main and named for its work.',
-    'dev': 'development: where features are tested together. It may be broken, and being here does not mean release.',
-    'stage': 'stage: the release. The chosen features, verified together. What is verified here is what ships.',
+    'dev': 'development: where features are merged, so that any conflict between them shows. Nothing is run on it, and being here does not mean release.',
+    'stage': 'stage: the release. The features on the release list, run and checked together. What is verified here is what ships.',
     'main': 'main: what is released. Only a promoted stage reaches it, and all work starts from it.',
     'hot': 'A hotfix: a fix that cannot wait for the next release, cut from main and named for the fault it fixes.',
     'mrg': 'A merge branch: cut from the receiving branch as it is on GitHub, only to resolve a conflict.',
@@ -20,10 +20,9 @@ BR_TIP = {
 }
 NAME_TIP = {
     'production': 'What is deployed and running. It is not a branch; it is shown here only to say which release is live.',
-    'candidate': 'A candidate: main plus the release set, merged in release order on a machine, where the whole suite is run on the set before stage is built. It is never pushed and never merged anywhere.',
     'on GitHub': 'development as it is on GitHub. This is the branch; a copy on a machine is only a copy.',
     'your copy': 'A copy of development on a machine, for running and testing only. It is taken from GitHub with no local branch.',
-    'a feature that waits': 'A feature that was tested but left out of this release. It goes round again.',
+    'a feature that waits': 'A feature that is on development but not on this release list. It goes round again.',
 }
 PR = ('gh pr create --base {to} --head {kind}/<id>-<name> --title "Merge branch \'{kind}/<id>-<name>\' into {to}"\n'
       'gh pr merge <number> --merge --subject "Merge branch \'{kind}/<id>-<name>\' into {to}" --body "Pull-request: <the pull request\'s URL>"')
@@ -44,7 +43,7 @@ def link_tip(fc, fid, tc, tid, dash):
         return f'{tid} takes {fid}', None
     kind = 'hotfix' if 'hot' in (fc, tc) else 'feature'
     if fc == 'main' and tc == 'dev':
-        return 'main is merged into development by pull request, after a release or a hotfix. This brings the release itself into development, which usually stays as it is.', MAIN_PR
+        return 'main is merged into development by pull request, after a hotfix, or after a release where development is kept running. This brings the release itself into development.', MAIN_PR
     if fc == 'main' and tc == 'coord':
         return 'The coordination branch is cut from main and named for the coordination.', CUT.format(kind='coordination')
     if tc == 'coord':
@@ -79,8 +78,7 @@ def dot_tip(cls, bid, kind):
         return ('A feature that was merged into development before the reset.', None) if kind == 'm' else ('development after the reset: the same as main.', None)
     if kind == 'q':
         if cls == 'stage':
-            return ('QA: the project\'s whole suite, run on stage itself by a fresh agent that has built nothing in the project. It gives a result for each scenario.',
-                    'git fetch origin\ngit switch --detach origin/stage')
+            return ('QA: a fresh agent that has built nothing in the project reads each scenario against the tests that name it, checks by hand what they do not check, and gives a result for each scenario. It does not run the suite.', None)
         if cls == 'mrg':
             return 'The conflict is resolved here, in the merge. The feature is not changed.', None
         if cls == 'coord':
@@ -98,15 +96,19 @@ def dot_tip(cls, bid, kind):
 
 
 READY = 'The work is readied: what is to be built is written down, with a story and scenarios where it is new behaviour. A fix names the scenario it restores, or adds one for the fault. Until then it is still backlog and has no branch.'
-QA_SAY = 'QA: the project\'s whole suite is run on stage itself, by a fresh agent that has built nothing in the project. It gives a result for each scenario the release set names, and reports to the agent that started it. It fixes nothing and pushes nothing.'
+SUITE_SAY = 'The suite\'s run: the project\'s whole suite is run on stage, once, by the agent assembling the release. It is mechanical, and each command and its result is noted. It is run again only if stage changes.'
+SUITE_TIP = 'The suite\'s run: the project\'s whole suite, run once on the named commit of stage, taken from GitHub without a local branch. Each command and its result is noted.'
+QA_SAY = 'QA: a fresh agent that has built nothing in the project reads each scenario the release names against the tests that name it, checks by hand what they do not check, and gives a result for each. It starts from the suite\'s results and does not run the suite. It reports to the agent that started it, and fixes nothing and pushes nothing.'
 ACCEPT_SAY = 'QA\'s report is put in front of the maintainer, whose word to promote is acceptance. On that word, the agent that assembled stage promotes it to main by pull request and tags the release twice: a name of version, pull request and date for people, and the bare version for tools.'
-JOIN = 'main, now holding the release, is merged into development by pull request. This brings the release itself into development, which until then holds the released features only by their own separate merges; the section on resolving a conflict says why that matters.'
-STAY = 'development and stage usually stay as they are after a release: stage already holds what main holds, and the released features are already on development.'
+JOIN = 'development is rebuilt, on the word to promote: reset to main, which now holds the release. By then most of what it held is released, so the reset costs little, and a development left running for many releases gathers merges GitHub reads as conflicts Git does not have.'
+AGAIN = 'Each feature still in progress that was on development is merged into it again, from its own branch by pull request, without being tested or code reviewed again.'
+STAY = 'stage stays as it is: it already holds what main holds.'
+NOT_BACK = 'Feature B is not sent back by the release: it is merged again as it was. A feature still being built may pull main now; one already tested is not tested again because of it.'
 
 
 # One step between main and a feature ---------------------------------------------
 def main_fig():
-    f = Fig(1100, 212, 'Every feature is cut from main, and after each release it pulls main.')
+    f = Fig(1100, 212, 'Every feature is cut from main, and pulls main again before it is first tested.')
     M, A = 62, 142
     f.lane('main', M); f.lane('feat', A, [(380, 1076)], 'a feature')
     f.dot('main', 226, M, 'm'); f.tag(226, M, 'release', up=True)
@@ -114,9 +116,9 @@ def main_fig():
     f.label(368, A + 30, 'a feature is cut from main,\nholding what is released')
     for x in (440, 500):
         f.dot('feat', x, A)
-    f.dot('main', 640, M, 'm'); f.tag(640, M, 'next release', up=True)
+    f.dot('main', 640, M, 'm'); f.tag(640, M, 'a release meanwhile', up=True)
     f.link('main', 660, M, 716, A, dash=True); f.dot('feat', 716, A, 'm')
-    f.label(728, A + 30, 'after each release,\nthe feature pulls main', 'start')
+    f.label(728, A + 30, 'before it is first tested,\nthe feature pulls main', 'start')
     return f
 
 
@@ -124,7 +126,7 @@ def main_fig():
 def road():
     f = Fig(1100, 430, 'One feature travels from main, through development and stage, back to main; a second feature stays on development.')
     A, B, D, S, M = 64, 128, 216, 288, 360
-    f.lane('dev', D); f.lane('stage', S); f.lane('main', M)
+    f.lane('dev', D, [(X0, 922)]); f.lane('stage', S); f.lane('main', M)
     f.dot('main', 212, M, 'm'); f.tag(212, M, 'last release')
     f.step(READY)
     f.label(196, 30, 'A is readied: what is to be built\nis written down', 'start')
@@ -138,73 +140,79 @@ def road():
     f.lane('feat', B, [(432, 1076)], 'feature B')
     for x in (462, 500):
         f.dot('feat', x, B)
-    f.step('Feature A\'s own tests pass in its own folder. Then its code is reviewed on its own branch by an agent that did not write it, and each finding is answered, before the feature goes anywhere.')
+    f.step('Feature A pulls main, then its own tests, those that name its scenarios, pass in its own folder. Then its code is reviewed on its own branch by an agent that did not write it, and each finding is answered, before the feature goes anywhere.')
     f.dot('feat', 470, A, 'q'); f.label(470, A - 20, 'code reviewed')
-    f.step('Each feature, code reviewed on its own branch, is merged into development by its own pull request, once, and they are tested together. Being on development does not mean a feature will be released.')
+    f.step('Each feature, tested and code reviewed on its own branch, pulls main and is merged into development by its own pull request, once. Nothing is run on development: it is where the features meet and any conflict between them shows. Being on development does not mean a feature will be released.')
     f.dot('feat', 546, B, 'q')
     f.link('feat', 542, A, 610, D); f.dot('dev', 610, D, 'm')
     f.link('feat', 622, B, 668, D); f.dot('dev', 668, D, 'm')
-    f.label(640, D + 28, 'tested together')
-    f.step('The maintainer chooses feature A for the release. Feature A pulls main if anything has been released since it was cut. The chosen set is first built and tested as a candidate on a machine, which a later section shows. Then feature A is merged into stage from its own branch, so it arrives without feature B.')
-    f.link('feat', 690, A, 766, S); f.dot('stage', 766, S, 'm')
-    f.label(752, A + 5, 'chosen for the release', 'start')
+    f.label(640, D + 28, 'merged; nothing is run')
+    f.step('Feature A is on the release list the maintainer named. Once it is on development and meets the bar for stage, and the maintainer has confirmed the list, it is merged into stage from its own branch, so it arrives without feature B. Nothing is built or run anywhere first.')
+    f.link('feat', 690, A, 760, S); f.dot('stage', 760, S, 'm')
+    f.label(752, A + 5, 'on the release list', 'start')
+    f.step(SUITE_SAY)
+    f.dot('stage', 794, S, 'q', tip=SUITE_TIP); f.label(794, S + 30, 'the suite')
     f.step(QA_SAY)
-    f.dot('stage', 808, S, 'q'); f.label(808, S - 20, 'verified')
+    f.dot('stage', 826, S, 'q'); f.label(826, S - 20, 'QA')
     f.step(ACCEPT_SAY)
     f.link('stage', 850, S, 900, M); f.dot('main', 900, M, 'm'); f.tag(900, M, 'release')
     f.step(JOIN)
-    f.link('main', 920, M, 968, D); f.dot('dev', 968, D, 'm')
-    f.label(968, D - 20, 'main goes into development')
-    f.step('Feature B, still in progress, pulls main. It is already on development and stays there. ' + STAY)
-    f.link('main', 990, M, 1040, B, dash=True); f.dot('feat', 1040, B, 'm')
-    f.label(1040, B - 20, 'pulls main')
+    f.lane('dev', D, [(968, 1076)], pill=False)
+    f.link('main', 920, M, 968, D, dash=True); f.dot('dev', 968, D, 'c')
+    f.label(968, D - 20, 'development rebuilt')
+    f.step(AGAIN + ' ' + NOT_BACK + ' ' + STAY)
+    f.link('feat', 1000, B, 1046, D); f.dot('dev', 1046, D, 'm')
+    f.label(1040, B - 20, 'merged again', 'end')
     return f
 
 
 # A release -----------------------------------------------------------------------
 def release():
-    f = Fig(1100, 440, 'Three features are each code reviewed on their own branch, then tested together. Two are chosen for the release, verified on stage, and promoted to main. Afterwards main goes into development and the feature left out pulls main; development and stage usually stay as they are.')
+    f = Fig(1100, 440, 'Three features are each tested and code reviewed on their own branch, then merged into development, where nothing is run. Two are on the release list: they are merged into stage, the suite is run there once, QA checks it, and it is promoted to main. Afterwards development is rebuilt from main, with B merged into it again; stage stays as it is.')
     A, B, C, D, S, M = 70, 122, 174, 250, 314, 378
-    f.band(160, 438, '1  Code reviewed, tested together')
-    f.band(438, 676, '2  The release set, on stage', alt=True)
+    f.band(160, 438, '1  Tested, code reviewed, merged')
+    f.band(438, 676, '2  The release list, on stage', alt=True)
     f.band(676, 890, '3  Accepted and promoted')
     f.band(890, 1100, '4  After the release', alt=True)
     f.lane('feat', A, [(X0, 466)], 'feature A')
     f.lane('feat', B, None, 'feature B')
     f.lane('feat', C, [(X0, 536)], 'feature C')
-    f.lane('dev', D); f.lane('stage', S); f.lane('main', M)
+    f.lane('dev', D, [(X0, 912)]); f.lane('stage', S); f.lane('main', M)
     for x, y in ((200, A), (212, B), (224, C)):
         f.dot('feat', x, y)
-    f.step('Each of three features passes its own tests in its own folder and is code reviewed on its own branch, with the findings answered. Then each is merged into development by its own pull request, once, and they are tested together. development may be broken; that is what it is there to find.')
+    f.step('Before the work, the maintainer names the release list: A and C. Each of three features pulls main, passes its own tests in its own folder and is code reviewed on its own branch, with the findings answered. Then each pulls main again and is merged into development by its own pull request, once. Nothing is run on development; it is where any conflict between them shows. Each time a feature on the list lands, the list is checked: is each feature on development, and does it meet the bar for stage.')
     for x, y in ((224, A), (238, B), (298, C)):
         f.dot('feat', x, y, 'q')
     for x, y in ((246, A), (306, B), (366, C)):
         f.link('feat', x, y, x + 46, D); f.dot('dev', x + 46, D, 'm')
-    f.step('The maintainer chooses A and C for the release. The set is first built as a candidate on a machine and the whole suite is run on it, which a later section shows. Then each is merged into stage from its own branch, in the same order, one pull request each. B is left out.')
+    f.step('Every feature on the list meets the bar, and the maintainer confirms the list. A and C are merged into stage from their own branches, in the order they first went into development, one pull request each. No candidate is built first. B is not on the list.')
     f.link('feat', 466, A, 524, S); f.dot('stage', 524, S, 'm')
     f.link('feat', 536, C, 588, S); f.dot('stage', 588, S, 'm')
-    f.label(604, B - 10, 'left out of this release', 'start')
-    f.step(QA_SAY + ' A pass on development proves nothing about the release.')
-    f.dot('stage', 642, S, 'q'); f.label(642, S + 30, 'verified')
+    f.label(604, B - 10, 'not on this release list', 'start')
+    f.step(SUITE_SAY + ' This is the one run of the whole suite.')
+    f.dot('stage', 620, S, 'q', tip=SUITE_TIP); f.label(620, S + 30, 'the suite')
+    f.step(QA_SAY)
+    f.dot('stage', 652, S, 'q'); f.label(652, S - 20, 'QA')
     f.step(ACCEPT_SAY)
     f.link('stage', 740, S, 790, M); f.dot('main', 790, M, 'm'); f.tag(790, M, 'release')
     f.step(JOIN)
-    f.link('main', 910, M, 958, D); f.dot('dev', 958, D, 'm')
-    f.label(958, D - 20, 'main goes into development')
-    f.step('Feature B, still in progress, pulls main. It is already on development and stays there. ' + STAY)
-    f.link('main', 996, M, 1046, B, dash=True); f.dot('feat', 1046, B, 'm')
-    f.label(1046, B - 16, 'pulls main', 'end')
+    f.lane('dev', D, [(958, 1076)], pill=False)
+    f.link('main', 910, M, 958, D, dash=True); f.dot('dev', 958, D, 'c')
+    f.label(958, D - 20, 'development rebuilt')
+    f.step(AGAIN + ' ' + NOT_BACK + ' ' + STAY)
+    f.link('feat', 1000, B, 1046, D); f.dot('dev', 1046, D, 'm')
+    f.label(1046, B - 16, 'merged again', 'end')
     return f
 
 
 # Rework after a code review --------------------------------------------------------
 def rework():
-    f = Fig(1100, 300, 'A feature is code reviewed on its own branch before its first merge. Each finding is classified and dealt with by its kind. A defect or a risk is fixed on the feature\'s own branch and the fix is code reviewed. The feature is then merged into development once, and on stage it gets QA only.')
+    f = Fig(1100, 300, 'A feature is code reviewed on its own branch before its first merge. Each finding is classified and dealt with by its kind. A defect or a risk is fixed on the feature\'s own branch and the fix is code reviewed. The feature is then merged into development once, and on stage it gets the suite\'s run and QA only.')
     A, D, S = 70, 160, 240
     f.lane('feat', A, [(X0, 800)], 'feature A'); f.lane('dev', D); f.lane('stage', S)
     for x in (206, 244):
         f.dot('feat', x, A)
-    f.step('The feature is built and its own tests pass in its own folder. Before it is merged anywhere, its code is reviewed on its own branch by an agent that did not write it. The code review reads the feature\'s own code and tests, and reports findings.')
+    f.step('The feature is built, pulls main, and its own tests pass in its own folder. Before it is merged anywhere, its code is reviewed on its own branch by an agent that did not write it. The code review reads the feature\'s own code and tests, and reports findings.')
     f.dot('feat', 310, A, 'x', tip='The code review reports findings. The builder checks each one against the source, the file and the line, before accepting it.')
     f.label(310, A - 20, 'code review: findings', strong=True)
     f.step('The builder classifies each finding, and acts on its kind: a defect, a risk, a missing or weak test, untrue wording, design or style, or wrong. The reviewer\'s own label, blocking or not, is not the classification. The table below says what happens to each kind.')
@@ -216,13 +224,13 @@ def rework():
     f.step('The rework is code reviewed again only when it fixed a defect or a risk. That code review reads whether the fix closes the finding, and what the fix itself changed; it is not a second reading of the feature. Rework for a test, for wording or for a backlog item is not code reviewed again.')
     f.dot('feat', 580, A, 'q', tip='The code review of the fix: whether it closes the finding, and what the fix itself changed.')
     f.label(580, A - 20, 'the fix is code reviewed')
-    f.step('The code review is reported: the decision, and each finding with its kind and how it ended. The feature is merged into development by pull request, once, and tested with the others.')
+    f.step('The code review is reported: the decision, and each finding with its kind and how it ended. The fixed feature is tested again. It pulls main and is merged into development by pull request, once. Nothing is run there.')
     f.link('feat', 716, A, 766, D); f.dot('dev', 766, D, 'm')
     f.label(750, D + 28, 'merged into development once', 'end')
-    f.step('When it is chosen, it is merged into stage from its own branch. Nothing is code reviewed on stage: each feature\'s code review was done once, at the feature, and stage gets QA only, by a fresh agent.')
+    f.step('When stage is built from the release list, it is merged into stage from its own branch. Nothing is code reviewed on stage: each feature\'s code review was done once, at the feature. stage gets the suite\'s run, once, and QA, by a fresh agent.')
     f.link('feat', 800, A, 860, S); f.dot('stage', 860, S, 'm')
-    f.dot('stage', 920, S, 'q')
-    f.label(920, S + 30, 'QA only')
+    f.dot('stage', 904, S, 'q', tip=SUITE_TIP); f.dot('stage', 940, S, 'q')
+    f.label(922, S + 30, 'the suite, then QA')
     return f
 
 
@@ -286,20 +294,20 @@ def hotfix():
     f.link('main', 336, M, 392, H)
     f.lane('hot', H, [(392, 680)], 'hotfix')
     f.label(404, H + 26, '2  the hotfix is cut\nfrom main', 'start')
-    f.step('stage is reset to main. A release that was being assembled there is set aside, and is merged into stage again once the hotfix is out.')
+    f.step('stage is reset to main. A release that was being built there is set aside, and its list is merged into stage again once the hotfix is out.')
     f.lane('stage', S, [(462, 1076)], pill=False)
     f.link('main', 412, M, 462, S, dash=True); f.dot('stage', 462, S, 'c')
     f.label(446, M + 24, '3  stage is reset to main')
-    f.step('The fix is made test-first and tested in the hotfix\'s own folder, and its code is reviewed by an agent that did not write it. Then it is merged into stage by pull request, on the maintainer\'s word.')
+    f.step('The fix is made test-first, its own tests are run in the hotfix\'s own folder, and its code is reviewed by an agent that did not write it. It is its own release list of one. It is merged into stage by pull request, on the maintainer\'s word.')
     for x in (444, 496):
         f.dot('hot', x, H)
     f.dot('hot', 600, H, 'q')
     f.label(520, H - 20, '4  fixed, tested, code reviewed', 'start')
     f.link('hot', 680, H, 740, S); f.dot('stage', 740, S, 'm')
-    f.step('stage is verified by a fresh agent; the set is the one fix, so there is no candidate to build first. If it fails, the fix is corrected on the hotfix branch and code reviewed there, stage is reset to main again or the correction merged on top, and it is checked again. Then it is promoted to main and tagged, on the maintainer\'s word. The hotfix never goes straight to main.')
-    f.dot('stage', 792, S, 'q'); f.label(792, S - 20, '5  verified')
+    f.step('The whole suite is run on stage, once, and a fresh agent does QA. If either fails, the fix is corrected on the hotfix branch, tested again, and code reviewed again where the correction is to a defect or a risk; stage is reset to main again or the correction merged on top; the suite is run again, and QA checks what changed. Then it is promoted to main and tagged, on the maintainer\'s word. The hotfix never goes straight to main.')
+    f.dot('stage', 778, S, 'q', tip=SUITE_TIP); f.dot('stage', 810, S, 'q'); f.label(794, S - 20, '5  the suite, then QA')
     f.link('stage', 850, S, 900, M); f.dot('main', 900, M, 'm'); f.tag(900, M, 'release')
-    f.step('development does not hold the fix. It gets it when main is merged into it by pull request, the same step as after any release, and every feature in progress pulls main. development need not be reset for a hotfix, and the features on it stay where they are.')
+    f.step('development does not hold the fix. It gets it when main is merged into it by pull request: after a hotfix, development is not rebuilt, since the work in progress is where it was. No feature is sent back by it, and the features on development stay where they are.')
     f.link('main', 960, M, 1010, D); f.dot('dev', 1010, D, 'm')
     f.label(1024, D - 14, '6  from main', 'start')
     return f
@@ -325,7 +333,7 @@ def rollback():
     f.link('main', 604, M, 660, H); f.lane('hot', H, [(660, 800)], 'hotfix')
     f.dot('hot', 700, H); f.dot('hot', 750, H, 'q')
     f.label(648, H + 4, 'the hotfix is cut from main', 'end')
-    f.step('The hotfix goes through stage, is verified and is promoted like any other, and the corrected release is deployed. Nothing is reverted on main directly, and the bad release keeps its tag.')
+    f.step('The hotfix goes through stage, where the suite is run and QA checks it, and is promoted like any other, and the corrected release is deployed. Nothing is reverted on main directly, and the bad release keeps its tag.')
     f.link('hot', 800, H, 850, S); f.dot('stage', 850, S, 'm')
     f.dot('stage', 900, S, 'q')
     f.link('stage', 924, S, 970, M); f.dot('main', 970, M, 'm'); f.tag(970, M, 'v0.7.1', up=True)
@@ -335,7 +343,7 @@ def rollback():
 
 # The loop ------------------------------------------------------------------------
 def loop():
-    f = Loop(1100, 820, 550, 412, 'One release drawn as a loop: a feature is cut from main, code reviewed on its own branch, tested on development, chosen for stage, verified, and promoted to main; main goes into development, features in progress pull main, and the next turn begins. Development and stage usually stay as they are after a release.')
+    f = Loop(1100, 820, 550, 412, 'One release drawn as a loop: a feature is cut from main, tested and code reviewed on its own branch, merged into development, merged into stage from the release list, run and checked there, and promoted to main; development is rebuilt from main, and the next turn begins.')
     A, B, D, S, M = 300, 254, 208, 162, 116
     f.ring('feat', B, None, 'a feature that waits'); f.ring('main', M)
     f.ring('dev', D); f.ring('stage', S)
@@ -352,27 +360,26 @@ def loop():
     for t in (.15, .2):
         f.rdot('feat', t, A)
     f.num(.118, A + 21, 1); f.out(.09, '1  a feature is cut\nfrom main')
-    f.step('Its own tests pass in its own folder, and its code is reviewed on its own branch, with each finding answered. Then it is merged into development, once, and tested together with the others.')
+    f.step('It pulls main, its own tests pass in its own folder, and its code is reviewed on its own branch, with each finding answered. Then it is merged into development, once. Nothing is run there.')
     f.rdot('feat', .24, A, 'q')
     f.rlink('feat', .272, A, .30, D); f.rdot('dev', .30, D, 'm')
-    f.num(.318, D + 21, 2); f.out(.29, '2  code reviewed, then\ntested together')
-    f.step('The maintainer chooses the release set. It is first built and tested as a candidate on a machine. Then each feature is merged into stage from its own branch, in the same order.')
+    f.num(.318, D + 21, 2); f.out(.29, '2  tested, code reviewed,\nmerged into development')
+    f.step('The maintainer has named the release list. Once every feature on it meets the bar and the list is confirmed, each is merged into stage from its own branch, in the order it first went into development.')
     f.rlink('feat', .415, A, .455, S); f.rdot('stage', .455, S, 'm')
-    f.num(.478, S + 21, 3); f.out(.44, '3  chosen for\nthe release')
-    f.step(QA_SAY)
+    f.num(.478, S + 21, 3); f.out(.44, '3  on the\nrelease list')
+    f.step(SUITE_SAY + ' ' + QA_SAY)
     f.rdot('stage', .515, S, 'q')
-    f.num(.535, S + 23, 4); f.out(.515, '4  verified')
+    f.num(.535, S + 23, 4); f.out(.515, '4  the suite,\nthen QA')
     f.step(ACCEPT_SAY)
     f.rlink('stage', .60, S, .635, M); f.rdot('main', .635, M, 'm')
     x, y = f.pt(.69, M + 21)
     f.tag(x, y - 27, 'release')
     f.num(.61, M + 21, 5); f.out(.62, '5  accepted, promoted\nand tagged')
     f.step(JOIN)
-    f.rlink('main', .755, M, .795, D); f.rdot('dev', .795, D, 'm')
-    f.num(.813, D + 21, 6); f.out(.785, '6  main goes into\ndevelopment')
-    f.step('Features still in progress pull main. A feature that waits is already on development and goes round again. development and stage usually stay as they are after a release, and the next turn begins.')
-    f.rlink('main', .875, M, .92, B, dash=True); f.rdot('feat', .92, B, 'm')
-    f.num(.937, B + 21, 7); f.out(.91, '7  features in progress\npull main')
+    f.rlink('main', .755, M, .795, D, dash=True); f.rdot('dev', .795, D, 'c')
+    f.num(.813, D + 21, 6); f.out(.785, '6  development\nrebuilt from main')
+    f.step(AGAIN + ' A feature that waits goes round again. It is not sent back by the release. stage stays as it is, and the next turn begins.')
+    f.num(.937, B + 21, 7); f.out(.91, '7  a feature that waits\ngoes round again')
     return f
 
 
@@ -427,10 +434,10 @@ def cards(rows, raw=False):
 CHECKS = [
     ('main', 'Plan', 'The files, the changes, their order, the risks and how the result will be verified.', 'The agent that will build', 'when', 'Before building, where a wrong call would be costly after it is merged'),
     ('main', 'Plan review', 'A reading of the plan against the code.', 'A second agent', 'when', 'When a plan needs further input or a second opinion'),
-    ('feat', 'Test', 'The feature\'s own tests and scenarios, run in the feature\'s own folder.', 'The agent that built it', 'always', 'Before its code review, and whenever it changes'),
+    ('feat', 'Test', 'The feature\'s own tests, those that name its scenarios, run on its committed code in the feature\'s own folder, after it has pulled main.', 'The agent that built it', 'always', 'Before its code review, and whenever its code changes. A pull does not start it'),
     ('feat', 'Code review', 'A reading of the feature\'s own code and tests, on the feature\'s own branch. The builder checks each finding against the source, classifies it, and deals with it by its kind. A rework is code reviewed again only when it fixed a defect or a risk, and that code review reads the fix. Nothing is code reviewed on stage.', 'An agent that did not write it', 'always', 'Before the first merge into development, and for every hotfix'),
-    ('dev', 'Testing together', 'The features on development, run together.', 'Whoever merged it', 'always', 'After each merge into development'),
-    ('stage', 'QA', 'The independent check of stage. The whole suite, run on stage itself. It gives a result for each scenario the release set names: verified by a test, partly verified, no test found, checked by hand, or failed, saying what failed and what kind of fault it is. It also confirms the list of what each feature has and lacks. Its brief is fixed text, sent as written with its blanks filled in.', 'A fresh agent that has built nothing in the project', 'always', 'After the release set is on stage'),
+    ('stage', 'The suite\'s run', 'The project\'s whole suite, run once on the named commit of stage, with each command and its result noted, and reported with its regression count. It is mechanical: no judgement is used. It is the one run of the whole suite.', 'The agent assembling the release', 'always', 'Once the release list is merged into stage, and again only when stage changes'),
+    ('stage', 'QA', 'The independent check of stage. Each scenario the release names is read against the tests that name it, and what the tests do not check is checked by hand. It gives a result for each: verified by a test, partly verified, no test found, checked by hand, or failed, saying what failed and what kind of fault it is. It also confirms the list of what each feature has and lacks. It does not run the suite. Its brief is fixed text, sent as written with its blanks filled in.', 'A fresh agent that has built nothing in the project', 'always', 'After the suite has passed on stage'),
     ('main', 'Acceptance', 'The maintainer\'s word to promote stage to main, given with QA\'s report in front of them.', 'The maintainer', 'always', 'After QA'),
 ]
 
@@ -442,14 +449,14 @@ def checks():
         out.append(f'<li class="step c-{cls}"><span class="n">{i}</span><h3>{esc(t)}</h3><p>{esc(what)}</p>'
                    f'<dl><dt>Who</dt><dd>{esc(who_)}</dd><dt>When</dt><dd>{esc(when)}</dd></dl>{badge}</li>')
     return ('<ol class="steps seven">' + ''.join(out) + '</ol>'
-            '<p class="note"><b>When something fails.</b> A failure belongs to a feature, wherever it is caught. It is said which step caught it (the feature\'s own tests, the code review, testing together, the candidate, QA on <code>stage</code>) and what kind it is, by the six kinds of finding listed under rework after a code review. The feature goes back to its builder and is fixed on its own branch. Knowing the step and the kind is what shows, over time, which step catches what and what reaches <code>stage</code>.</p>')
+            '<p class="note"><b>When something fails.</b> A failure belongs to a feature, wherever it is caught. It is said which step caught it (the feature\'s own tests, the code review, the suite\'s run on <code>stage</code>, QA) and what kind it is, by the six kinds of finding listed under rework after a code review. The feature goes back to its builder and is fixed on its own branch. Knowing the step and the kind is what shows, over time, which step catches what and what reaches <code>stage</code>.</p>')
 
 
 HOLDS = [
     ('main', 'main', [('code', 'the released code')]),
     ('feat', 'a feature', [('code', 'the released code, as it stood when the feature was cut'), ('rec2', '+ what it has pulled from main since'), ('own', '+ this feature\'s code')]),
-    ('dev', 'development', [('code', 'the released code'), ('rec2', '+ main, merged in after each release and hotfix'), ('own', '+ the code of every feature being tested')]),
-    ('stage', 'stage', [('code', 'the released code'), ('own', '+ the code of the release set')]),
+    ('dev', 'development', [('code', 'the released code'), ('rec2', '+ main, as it was when development was last rebuilt, and any hotfix since'), ('own', '+ the code of every feature merged there')]),
+    ('stage', 'stage', [('code', 'the released code'), ('own', '+ the code of the features on the release list')]),
 ]
 
 
@@ -464,7 +471,6 @@ def holds():
 FOLDERS = [
     ('main', 'The project\'s own folder', '~/Development/<Project>', 'The user works here, on checked-out branches. An agent does not.'),
     ('feat', 'A folder for each feature', '~/Development/worktrees/<Project>/<kind>-<id>-<name>', 'An agent works here, one folder to a branch, and never in a checkout someone else is using. The feature is built and tested here.'),
-    ('mrg', 'The candidate\'s folder', '~/Development/worktrees/<Project>/candidate', 'main plus a release set, built to run the whole suite on the set. It is never pushed, and is removed when stage has been verified.'),
 ]
 
 
@@ -476,11 +482,11 @@ def folders():
 WHO = [
     ('Commit on a feature', 'free', 'As often as needed'),
     ('Push a feature, then open and merge its pull request into development', 'free', 'For work the user has said to work, once its code review is answered. A feature already on development is merged again after rework'),
-    ('Open a pull request into stage', 'word', 'The maintainer chooses the release set. The word to build a release candidate covers its pull requests into stage. Including a feature below the bar is the maintainer\'s decision'),
+    ('Open a pull request into stage', 'word', 'The maintainer names the release list. The maintainer\'s confirmation of the list covers its pull requests into stage. Including a feature below the bar is the maintainer\'s decision'),
     ('Promote stage to main, and tag the release', 'word', 'The maintainer\'s word to promote is acceptance. The agent that assembled stage performs it'),
-    ('Bring main into development, after a release or a hotfix', 'word', 'Covered by the maintainer\'s word to promote'),
-    ('Reset development', 'word', 'When that serves the work: usually when something has to come out of it, or to show a release candidate running. After an ordinary release it usually stays as it is'),
-    ('Reset stage', 'word', 'Usually when a feature has failed on it, before a hotfix, and before a release set is assembled if it holds anything main does not. The word to build a release candidate covers the resets of stage that the candidate needs'),
+    ('Rebuild development after a release, or bring main into it after a hotfix', 'word', 'Covered by the maintainer\'s word to promote'),
+    ('Reset development', 'word', 'When that serves the work: usually after a release, when something has to come out of it, or to show a release running before stage is built'),
+    ('Reset stage', 'word', 'Usually when a feature has failed on it, before a hotfix, and before a release is built on it if it holds anything main does not. The maintainer\'s confirmation of the release list covers the resets of stage that building it needs'),
     ('Change branch protection or repository settings', 'word', ''),
 ]
 
@@ -494,9 +500,8 @@ def who():
 
 
 ELIGIBLE = [
-    ('Its scenarios pass', 'Its work names its scenarios, or says why it has none; naming none, with no reason, does not meet this. Its tests pass in the feature\'s own folder for the code as it stands: a run made before the code last changed does not count, and the tests are run again. For a member of a coordination whose tests cannot pass alone, a passing run from the coordination branch\'s folder stands in its place when it names the commit of each member and no member has changed since.'),
+    ('Its scenarios pass', 'Its work names its scenarios, or says why it has none; naming none, with no reason, does not meet this. Its tests pass in the feature\'s own folder for the feature\'s own code as it stands: a run made before the feature\'s code last changed does not count, and the tests are run again. A pull that brought in what was released does not make a run out of date. For a member of a coordination whose tests cannot pass alone, a passing run from the coordination branch\'s folder stands in its place when it names the commit of each member and no member has changed since.'),
     ('Its code is reviewed', 'By an agent that did not write it, with each finding dealt with as its kind requires. A finding put to the maintainer keeps the feature out until it is answered, to fix it or to accept it as it is.'),
-    ('It has pulled main', 'It has pulled main since the last release, so it holds everything that is released.'),
     ('It stands alone', 'It holds no other unreleased feature\'s commits. A member of a coordination is chosen only with, or after, the members it requires.'),
     ('No open defect', 'None is known against it.'),
     ('Its decisions are accepted, and its story agreed', 'Every decision it rests on is accepted by the product owner. Any story an agent wrote for it has been seen and agreed by the product owner: a feature built from a story an agent wrote itself may be built to development, and waits at stage until then.'),
@@ -504,31 +509,78 @@ ELIGIBLE = [
 
 
 def eligible():
-    return (f'<ul class="gives six">{cards(ELIGIBLE)}</ul><p class="note">The release set is the maintainer\'s choice. The agent assembling the release says which features are eligible and lists what each lacks; it never chooses the set. That agent may have built part of the set, so the fresh QA agent confirms its list. '
+    return (f'<ul class="gives five">{cards(ELIGIBLE)}</ul><p class="note">The release list is the maintainer\'s choice. Each time a feature on it is merged into <code>development</code>, and each time the list changes, it is checked against this bar, and the maintainer is told that every feature meets it or which lacks what; the agent never chooses the list. That agent may have built part of the release, so the fresh QA agent confirms what it said. '
             'If the maintainer includes a feature below the bar, that is the maintainer\'s decision, given with what the feature lacked in front of them, and QA reports what it lacked as not verified.</p>')
 
 
 RESET_USUALLY = [
-    ('Something has to come out', 'A feature on development is abandoned or broken and holding the others up; a feature has failed on stage.'),
-    ('A clean start is needed', 'Before a hotfix, stage is reset so that the fix travels alone. Before a release set is assembled, stage is reset if it holds anything main does not.'),
-    ('The branch is to show one thing', 'development is rebuilt from a release set so that people can see that candidate running.'),
+    ('After a release, for development', 'What it held is by then mostly released. It is reset to main and the features still in progress are merged again. The maintainer\'s word to promote covers it.'),
+    ('Something has to come out', 'A feature on development is abandoned, or its merge is in the others\' way; a feature has failed on stage.'),
+    ('A clean start is needed', 'Before a hotfix, stage is reset so that the fix travels alone. Before a release is built on it, stage is reset if it holds anything main does not.'),
+    ('The branch is to show one thing', 'development is rebuilt from a release list so that people can look at that release wherever development is deployed. No test is run there.'),
     ('The branch can no longer be trusted', 'It has taken a merge it should not have, or so much has gone wrong on it that finding the cause costs more than building it again.'),
 ]
 RESET_SELDOM = [
-    ('After an ordinary release or hotfix', 'stage already holds what main holds, and the released features are already on development; main going into development joins it to the release.'),
-    ('While features on it are still being tried together', 'Resetting development means merging each of them again.'),
-    ('When a small correction to a feature of the set is quicker and as safe', 'The feature is fixed on its own branch and merged again by pull request, on top of what is there, where rebuilding the whole set would cost more than it protects. Nothing is ever changed on the branch itself.'),
+    ('stage, after a release or a hotfix', 'It already holds what main holds.'),
+    ('development, where the project has a reason to keep it running across releases', 'Such as wanting to see what builds up on it. Then main is merged into it by pull request after each release.'),
+    ('While features on it are waiting for a release', 'Resetting development means merging each of them again.'),
+    ('When a small correction to a feature of the release is quicker and as safe', 'The feature is fixed on its own branch and merged again by pull request, on top of what is there, where rebuilding the whole release would cost more than it protects. Nothing is ever changed on the branch itself.'),
 ]
 
 
 def resets():
     return ('<h3 class="sub">When to reset development or stage, and when to leave it running</h3>'
-            '<p class="note">Both can be reset to <code>main</code> when that serves the work. This is guidance, not a list to apply by rote: say which case you see and why, and where it is not plain, ask. A reset is a push, so it is on the maintainer\'s word; the word to build a release candidate covers the resets of <code>stage</code> that the candidate needs.</p>'
+            '<p class="note">Both can be reset to <code>main</code> when that serves the work. This is guidance, not a list to apply by rote: say which case you see and why, and where it is not plain, ask. A reset is a push, so it is on the maintainer\'s word; the maintainer\'s confirmation of the release list covers the resets of <code>stage</code> that building it needs.</p>'
             '<h3 class="sub">A reset is usually right</h3>'
             f'<ul class="gives two">{cards(RESET_USUALLY)}</ul>'
             '<h3 class="sub">It is usually better left running</h3>'
             f'<ul class="gives plain">{cards(RESET_SELDOM)}</ul>'
             '<p class="note">After a reset, the features that should still be there are merged again, each from its own branch by pull request, and everyone is told, so that anyone with a copy takes it from GitHub again.</p>')
+
+
+TESTING = [
+    ('feat', '1. Pull main into the feature', 'The feature\'s code is written, and it is about to be tested for the first time.', 'The agent that built it', 'main as it is on GitHub is merged into the feature, so that it is tested on what is released.'),
+    ('feat', '2. Test the feature', 'The feature\'s code is written, or has changed since it was last tested. A pull does not start it.', 'The agent that built it', 'The code is committed, and the feature\'s own tests, those that name its scenarios, are run in its folder.'),
+    ('feat', '3. Review the feature\'s code', 'Its tests pass and its code has not been reviewed. Or a rework has fixed a defect or a risk.', 'An agent that did not write the code; the builder answers', 'The feature\'s own code and tests are read, and each finding is answered by its kind. Nothing is run.'),
+    ('dev', '4. Merge the feature into development', 'Its tests pass and every finding is answered. Or a feature already there has been reworked.', 'The agent that built it', 'The feature pulls main, is pushed, and is merged by pull request. Nothing is run on development.'),
+    ('dev', '5. Check the release list', 'A feature on the list has just been merged into development. Or the maintainer has changed the list.', 'The agent that merged the feature; the maintainer owns the list', 'Each feature on the list is checked: it is on development, and it meets the bar for stage. The maintainer is told that all do, or which lacks what. Nothing is run.'),
+    ('stage', '6. Build stage from the list', 'Every feature on the list meets the bar, or is on it by the maintainer\'s word, and the maintainer has confirmed the list.', 'The agent assembling the release', 'stage is reset to main if it holds anything main does not, and each feature is merged by pull request. No candidate is built anywhere first.'),
+    ('stage', '7. Run the suite on stage', 'Every feature on the list is merged into stage. Or stage has changed since the suite last ran on it.', 'The agent assembling the release. It is mechanical', 'The project\'s whole suite is run on the named commit of stage, and each command and its result is noted, with the regression count. This is the one run of the whole suite.'),
+    ('stage', '8. QA', 'The suite has passed on stage.', 'A fresh agent that has built nothing in the project', 'Each scenario is read against the tests that name it; what the tests do not check is checked by hand; a result is given for every scenario. It does not run the suite.'),
+    ('stage', '9. A failure on stage', 'Step 7 or step 8 reports a failure.', 'The agent assembling the release, without waiting; the feature\'s builder fixes', 'The failure is recorded against its feature. Usually the feature comes off and stage is rebuilt; a small fix may be merged on top. Then step 7 again, and step 8 for the feature that was fixed; after a feature comes off, QA\'s results for the rest stand.'),
+    ('stage', '10. What QA observed outside the scenarios', 'QA\'s report names something wrong that fails no scenario.', 'The maintainer', 'The maintainer says: release as it is and put it in the backlog, or treat it as a failure (step 9).'),
+    ('main', '11. Acceptance', 'QA has reported and every failure is dealt with.', 'The maintainer', 'QA\'s report is put in front of the maintainer, who gives the word to promote. It covers step 12.'),
+    ('main', '12. Promote', 'The maintainer\'s word.', 'The agent that assembled stage', 'stage is merged into main by pull request and tagged. development is usually rebuilt: reset to main, with the features still in progress merged again; where it is left running, main is merged into it. Nothing is run.'),
+]
+
+
+def testing():
+    rows = ''.join(f'<tr class="c-{c}"><td><b>{esc(s)}</b></td><td>{esc(w)}</td><td>{esc(who_)}</td><td>{esc(d)}</td></tr>' for c, s, w, who_, d in TESTING)
+    return ('<p class="note">Before the work, where possible, the maintainer names the release list: the features the release is to hold. It is kept where the project\'s own instructions say; where they name no place, the agent assembling the release keeps it as the maintainer gave it and says it back at each check.</p>'
+            '<div class="tablewrap"><table class="testing"><thead><tr><th>Step</th><th>What starts it</th><th>Who</th><th>What is done</th></tr></thead>'
+            f'<tbody>{rows}</tbody></table></div>'
+            '<p class="note"><b>Every released scenario is tested again at every release.</b> Not every piece of work is worked on in every release, but the suite run on <code>stage</code> holds the tests of everything already released, so all of it is tested each time. That is a feature of the method, and it is why the whole suite runs on <code>stage</code> and nowhere earlier.</p>'
+            '<p class="note"><b>The regression count.</b> Every run of the suite reports how far it reached: the scenarios whose tests ran and passed; the scenarios whose tests were skipped, each named with the test; and the scenarios no test names, whose number is given every time and the new ones called out. A skipped test has not checked its scenario: it is never a pass, and where the skip came from the order of the commands or the machine, the test is run again on the same commit. The count is made by a script the project keeps, never by hand; where there is none, or the tests do not name their scenarios, the run says the count was not made and why, and still names each skipped test. Two limits are said with it every time: a test that names a scenario is not thereby shown to check it, and a test that has been weakened is not seen.</p>'
+            '<p class="note"><b>What this leaves out, on purpose.</b> Nothing is run when a feature lands on <code>development</code>. No copy of the release is built and tested before <code>stage</code>. A feature does not pull again because a release happened, and is not tested or code reviewed again because of one. QA does not run the suite. So <code>stage</code> is the first place the release\'s features are together without the rest of <code>development</code>, and a conflict or a failure between them is found there.</p>'
+            '<p class="note"><b>Showing a release before it is built.</b> Where people need to see a release running before <code>stage</code> is built, <code>development</code> can be reset to <code>main</code> and rebuilt from the release list, each feature by its own pull request. Nothing in the testing process depends on it.</p>')
+
+
+def see():
+    return ('<ul class="gives two">'
+            + cards([('Where', 'From the feature\'s own folder, apart from anything released that is in use: on a port of its own, with data of its own and never the real data.'),
+                     ('When', 'Before or after the feature is tested, whenever a person wants to see it. The agent says how to reach it, and builds it again when the code changes.')])
+            + '</ul><p class="note">Seeing the work is not testing it. The feature\'s own tests still run when its code is written or changes, and the release is proved on <code>stage</code>.</p>')
+
+
+def rebuild():
+    return ('<p class="note">On the maintainer\'s word to promote, once <code>stage</code> is promoted and tagged. First list the unreleased features <code>development</code> holds, the merges it has that <code>main</code> does not:</p>'
+            '<pre class="cmd">git fetch origin\ngit log --merges --first-parent --format=%s origin/main..origin/development</pre>'
+            '<p class="note">Reset it to <code>main</code>:</p>'
+            '<pre class="cmd">git push --force-with-lease origin origin/main:development</pre>'
+            '<p class="note">Merge each of those features again, from its own branch by pull request, as any feature is merged into <code>development</code>, without testing or code reviewing it again. Tell everyone, so that anyone with a copy takes it from GitHub again. Where nothing unreleased was on it, the reset is the whole of it.</p>'
+            f'<pre class="cmd">{esc(PR.format(to="development", kind="feature"))}</pre>'
+            '<p class="note"><b>Where a project keeps it running.</b> A project with a reason to keep <code>development</code> running across releases, such as wanting to see what builds up on it, merges <code>main</code> into it by pull request after each release instead. After a hotfix, <code>main</code> is merged into it the same way, since the work in progress is where it was.</p>'
+            f'<pre class="cmd">{esc(MAIN_PR)}</pre>')
 
 
 def history():
@@ -549,15 +601,17 @@ def history():
 
 
 RULES = [
-    ('Cut work from development or stage, or pull from either.', 'Work starts only from main, a hotfix included. A feature catches up with a release by pulling main.'),
+    ('Cut work from development or stage, or pull from either.', 'Work starts only from main, a hotfix included. A feature takes what is released by pulling main: before it is first tested, and as it is merged into development.'),
     ('Commit on development or stage, or merge into either on your own machine.', 'Both change only by a pull request on GitHub, merged as a real merge.'),
     ('Cut a branch for work that is not ready.', 'What is to be built is written down first, with a story and scenarios where it is new behaviour. A fix names the scenario it restores, or adds one for the fault. A standing instruction to keep working does not change this.'),
     ('Change anything in a merge beyond its conflict.', 'A merge resolves its conflict and nothing else. Any other change features need in order to work together is written on a feature\'s own branch, and the feature is merged again. Where the change is only right with the other features present, they are tied in a coordination.'),
     ('Merge a feature into development before its code review.', 'It is code reviewed on its own branch, and the findings answered, first, so that it is merged once.'),
     ('Commit work on a coordination branch, or merge it anywhere.', 'The work is done on the member\'s own branch, and the member is merged into the coordination branch again. The members go onward one by one.'),
-    ('Reset development or stage by rote.', 'Both can be reset to main when that serves the work. Say which case you see and why, and where it is not plain, ask. After an ordinary release both usually stay as they are: the released features are already on development.'),
-    ('Leave stage standing with a known fault.', 'Usually the feature comes out and stage is reset. Where the fault is small and quickly fixed on the feature\'s own branch, it may be merged again on top. Either way stage is checked again.'),
-    ('Count a scenario as passed because the suite passed.', 'QA gives a result for each scenario, and reports one with no test as no test found.'),
+    ('Reset development or stage by rote.', 'Both can be reset to main when that serves the work. Say which case you see and why, and where it is not plain, ask. After a release development is usually rebuilt, and stage stays as it is.'),
+    ('Leave stage standing with a known fault.', 'Usually the feature comes out and stage is reset. Where the fault is small and quickly fixed on the feature\'s own branch, it may be merged again on top. Either way the suite is run on stage again.'),
+    ('Run the suite again on code that has not changed.', 'A step is taken when what starts it has happened. A feature\'s tests run when its code changes; a pull, or a release made since, does not start them. Nothing is run on development. The whole suite runs once, on stage, and again only when stage changes.'),
+    ('Count a skipped test as a pass.', 'A skipped test has not checked its scenario. It is named, and where the skip came from the order of the commands or the machine, it is run again on the same commit.'),
+    ('Count a scenario as passed because the suite passed.', 'QA reads each scenario against the tests that name it and gives a result for each, and reports one with no test as no test found.'),
 ]
 
 
@@ -567,14 +621,14 @@ def rules():
 
 
 STEPS = [
-    ('main', 'Readied', 'What is to be built is written down, with a story and scenarios where it is new behaviour. A fix names the scenario it restores, or adds one for the fault.', ''),
+    ('main', 'Readied', 'What is to be built is placed under its use case and written down, with a story and scenarios where it is new behaviour. A fix names the scenario it restores, or adds one for the fault.', ''),
     ('feat', 'Cut and built', 'A branch is cut from main as it is on GitHub and named for its work, one piece of work to a branch, in a folder of its own. Commits as often as needed.', ''),
-    ('feat', 'Code reviewed', 'Its own tests pass in its own folder first. Then its code is reviewed on its own branch by an agent that did not write it, and each finding is answered, before its first merge into development, so that it is merged once.', ''),
-    ('dev', 'Tested together', 'A pull request into development, merged without asking, and the features there are run together. A break is fixed on the feature\'s own branch. Being here does not mean it will be released.', ''),
-    ('stage', 'Chosen', 'The maintainer chooses the release set from the features that are eligible.', 'word'),
-    ('stage', 'Assembled', 'Each feature of the set pulls main. The set is built as a candidate on a machine, main plus the set in release order, and the whole suite is run on it. Then one pull request into stage for each feature, in the same order, and stage is checked against the candidate.', ''),
-    ('stage', 'Verified', 'QA: the whole suite is run on stage by a fresh agent that has built nothing in the project, with a result for each scenario.', ''),
-    ('main', 'Promoted', 'QA\'s report is put in front of the maintainer. On the maintainer\'s word stage is promoted to main and tagged, and main is merged into development.', 'word'),
+    ('feat', 'Tested and code reviewed', 'It pulls main, and its own tests, those that name its scenarios, pass in its own folder. Then its code is reviewed on its own branch by an agent that did not write it, and each finding is answered.', ''),
+    ('dev', 'Merged into development', 'It pulls main, and a pull request into development is merged without asking. Nothing is run there. Being here does not mean it will be released.', ''),
+    ('stage', 'On the release list', 'The maintainer names the release list, before the work where possible. Each time a feature on it lands, the list is checked against the bar for stage.', 'word'),
+    ('stage', 'Built on stage', 'Once every feature on the list meets the bar and the list is confirmed, one pull request into stage for each, in the order they first went into development. No candidate is built first.', ''),
+    ('stage', 'Run and checked', 'The whole suite is run on stage, once, and reports its regression count. Then QA: a fresh agent that has built nothing in the project reads each scenario against its tests and checks by hand what they miss.', ''),
+    ('main', 'Promoted', 'QA\'s report is put in front of the maintainer. On the maintainer\'s word stage is promoted to main and tagged, and development is rebuilt from main.', 'word'),
 ]
 
 
@@ -583,14 +637,14 @@ def steps():
     for i, (cls, title, text, word) in enumerate(STEPS, 1):
         w = '<span class="word">waits for the maintainer\'s word</span>' if word else ''
         out.append(f'<li class="step c-{cls}"><span class="n">{i}</span><h3>{esc(title)}</h3><p>{esc(text)}</p>{w}</li>')
-    return ('<div class="standards"><span class="std a">Building to development: fast, and development may be broken</span>'
+    return ('<div class="standards"><span class="std a">Building to development: fast, and nothing is run there</span>'
             '<span class="std b">Choosing for stage: strict</span></div><ol class="steps">' + ''.join(out) + '</ol>')
 
 
 BRANCHES = [
     ('feat', 'feature', 'One piece of work, cut from main. Also fix and hotfix.'),
-    ('dev', 'development', 'Where features are tested together. It may be broken.'),
-    ('stage', 'stage', 'The release: the chosen features, verified together.'),
+    ('dev', 'development', 'Where features are merged, and their conflicts show. Nothing is run on it.'),
+    ('stage', 'stage', 'The release: the listed features, run and checked together.'),
     ('main', 'main', 'What is released. Only a promoted stage reaches it.'),
 ]
 
@@ -606,13 +660,14 @@ KEY = (
 )
 
 GIVES = [
-    ('A release is chosen, not inherited', 'Being on development does not put a feature in a release. The maintainer, the person who decides what is released, chooses the set feature by feature.'),
-    ('Development may be broken', 'It is where features are tried together. A break is fixed on the feature\'s own branch, and it does not hold up the release of the others.'),
+    ('A release is named, not inherited', 'Being on development does not put a feature in a release. The maintainer, the person who decides what is released, names the release list feature by feature.'),
+    ('Nothing is run on development', 'It is where features are merged and their conflicts show. The release\'s features are run together once, on stage.'),
     ('Many features at once', 'Every feature is built to stand alone, so several people or agents can build at the same time, each in a folder of its own (a Git worktree).'),
-    ('What is verified is what ships', 'stage holds the release set, verified as a whole. Nothing is changed on stage itself, and a pass on development proves nothing about the release.'),
+    ('What is verified is what ships', 'stage holds the release list and nothing else, run and checked as a whole. Nothing is changed on stage itself.'),
     ('A failed feature comes out cleanly', 'Usually stage is rebuilt without it. Nothing is backed out, and nothing is patched in place.'),
-    ('Each check is made once', 'A feature\'s own tests and its code review are done at the feature. The release does not repeat them: it checks that the chosen set works together, and that stage holds what was tested.'),
-    ('A hotfix takes a release\'s road, alone', 'Cut from main, verified on stage, promoted. It does not pass through development first, and it never goes straight to main.'),
+    ('Every released scenario is tested again at every release', 'Not every piece of work is worked on in every release, but the whole suite runs on stage, so everything already released is tested each time, and the run says how far it reached.'),
+    ('Each check is made once', 'A feature\'s own tests and its code review are done at the feature, and are not repeated because a release happened. The release runs the whole suite once, on what ships, and a fresh agent checks each scenario.'),
+    ('A hotfix takes a release\'s road, alone', 'Cut from main, run and checked on stage, promoted. It does not pass through development first, and it never goes straight to main.'),
     ('The history says where work has been', 'Every merge is a real merge whose title names both branches, so Git can say which branches hold a feature.'),
     ('Plain Git', 'Every step is ordinary Git, with pull requests on GitHub, and can be done by hand.'),
 ]
@@ -623,13 +678,13 @@ def purpose():
 <div class="cols">
 <div><h2>Why it exists</h2>
 <p>Most branching methods tie two decisions together: testing a feature with the others, and releasing it. Where features are cut from a shared <code>development</code> branch and merged back into it, whatever is on that branch is in the next release unless someone backs it out. One unfinished feature holds up everything behind it.</p>
-<p>Feature Promotion Flow separates the two. A feature is merged into <code>development</code> to be tested with the others, and that says nothing about release. The release is assembled separately, on <code>stage</code>, from the features chosen for it, each merged from its own branch.</p>
+<p>Feature Promotion Flow separates the two. A feature is merged into <code>development</code>, where its conflicts with the others show, and that says nothing about release. The release is built separately, on <code>stage</code>, from the features the maintainer lists for it, each merged from its own branch, and is tested and checked there.</p>
 <p>It is close to the method the Git project uses to build Git itself, <a href="https://git-scm.com/docs/gitworkflows">gitworkflow</a>: topic branches that graduate through integration branches, and tagged releases. In the projects it was written for, it replaced gitflow.</p>
 </div>
 <div><h2>Why features are cut from main</h2>
 <p>Git can merge a branch into any other branch it shares an ancestor with. What a branch was cut from decides what comes with it.</p>
-<p>A feature cut from <code>main</code> holds its own commits and what is released. So it can be merged into <code>development</code> for testing and later into <code>stage</code> for release, and neither merge brings another feature's code along. A feature cut from <code>development</code> would carry every other feature on <code>development</code> into <code>stage</code> with it.</p>
-<p>That is the whole of what lets a release be chosen feature by feature. So work starts only from <code>main</code>, a hotfix included, and a feature catches up with a release by pulling <code>main</code>.</p>
+<p>A feature cut from <code>main</code> holds its own commits and what is released. So it can be merged into <code>development</code> and later into <code>stage</code> for release, and neither merge brings another feature's code along. A feature cut from <code>development</code> would carry every other feature on <code>development</code> into <code>stage</code> with it.</p>
+<p>That is the whole of what lets a release be chosen feature by feature. So work starts only from <code>main</code>, a hotfix included, and a feature takes what is released by pulling <code>main</code>.</p>
 </div></div>
 {fig(main_fig(), 'A feature holds its own commits and what is released, and nothing of any other feature. Nobody cuts work from <code>development</code> or <code>stage</code>, and nobody pulls from them.')}
 <h2>What it gives you</h2>
@@ -639,12 +694,14 @@ def purpose():
 
 LIMITS = [
     ('The evidence so far', 'The method is new. As it is written here it has been run on one project, through few releases, and that project kept its record with Docket. Nothing here has yet been shown with several people on several machines, and every benefit below should be read with that in mind.'),
-    ('What it costs', 'A release of n features is 2n + 2 pull requests: each feature into development and into stage, stage into main, and main into development. It is also n code reviews, a candidate built and tested on a machine, and one full QA run. A feature that fails on stage usually costs a reset, the candidate built again, a pull request for each feature that remains, and QA again. A hotfix is three pull requests, a code review and a QA run, and sets aside any release being assembled.'),
+    ('What it costs', 'A release of n features is 2n + 2 pull requests: each feature into development and into stage, stage into main, and main into development. It is also n code reviews, one run of the whole suite, and one QA run. A feature that fails on stage usually costs a reset, a pull request for each feature that remains, and the suite run again. Because nothing runs the release\'s features together before stage, a conflict or a failure between them is found there. A hotfix is three pull requests, a code review, a run of the suite and a QA run, and sets aside any release being built.'),
     ('What it does not cover', 'The method says nothing about database migrations, or about fixing an older version while a newer one is out: there is one released line. It does not say how a release is deployed, and its rollback (see the section on a bad release) assumes the previous release can be deployed again. It does not say where a project keeps its backlog, its decisions or its code reviews.'),
     ('Against trunk-based development', 'Trunk-based development with feature flags separates testing from releasing another way: everything merges to one branch daily, and a flag decides what is released. It integrates sooner and needs no assembly. It asks that unfinished work be safe to ship switched off, and the flags, not the history, say what a release contains. This method makes the other trade. Integration comes later and costs more pull requests. In return a release is a set of whole features, each with its own tests and code review, and what is left out is not in the build at all.'),
 ]
 UNPROVEN = [
     ('Fewer regressions', 'This is what the design should produce. Too few releases have been through stage to show it.'),
+    ('What the regression count cannot show', 'A test that names a scenario is not thereby shown to check it, and a test that has been weakened still passes. The count says how far the suite reached, not how well each test checks.'),
+    ('The testing process as it now stands', 'The twelve steps were settled on November 23, 2026, after one project ran its whole suite four to six times for each release on code that had not changed. One project has since taken one small feature through them.'),
     ('Reliable release dates', 'They depend on features staying independent. Where features require each other, a coordination handles it, at the cost of some freedom to choose.'),
 ]
 
@@ -656,17 +713,17 @@ def limits():
 
 
 ADDUP = [
-    ('Reliable release dates', 'A release is chosen from what is ready, so the date does not wait on one unfinished feature. stage is rebuilt and not patched, so a late failure removes one feature, not the release. The date is the promise; the contents are whatever is ready by then.'),
-    ('Fewer regressions', 'Scenarios are written before the branch exists, so behaviour is pinned down first. The whole suite runs on the exact combination that ships. And after a hotfix main is merged into development, so the next release cannot quietly lose the fix.'),
+    ('Reliable release dates', 'The maintainer may change the release list at any time, so the date does not wait on one unfinished feature: it comes off the list. stage is rebuilt and not patched, so a late failure removes one feature, not the release. The date is the promise; the contents are whatever is ready by then.'),
+    ('Fewer regressions', 'Scenarios are written before the branch exists, so behaviour is pinned down first. The whole suite runs on the exact combination that ships, so every released scenario is tested again at every release. And after a hotfix main is merged into development, so the next release cannot quietly lose the fix.'),
     ('Checking by someone who did not build', 'A feature\'s code is reviewed by an agent that did not write it, and stage is checked by a fresh agent that has built nothing in the project. The agent that starts QA does not write its brief.'),
     ('A history that answers questions', 'Every merge is a real merge that names both branches and its pull request. Which of development, stage and main hold a piece of work is read from the history, not set by hand.'),
 ]
 STATIONS = [
-    ('feat', 'The feature\'s own folder', 'Its own tests and scenarios', 'A passing run, for the code as it stands'),
+    ('feat', 'The feature\'s own folder', 'Its own tests, those that name its scenarios, after it has pulled main', 'A passing run, for the commit it was run on'),
     ('feat', 'Code review', 'The code and its tests, on the feature\'s own branch, by an agent that did not write them', 'A report: the decision, and each finding with its kind and how it ended'),
-    ('dev', 'development', 'The features, run together', 'A break goes back to the feature that caused it'),
-    ('mrg', 'The candidate', 'The release set, together, with the whole suite, before stage is built', 'Its contents compared with stage, tree against tree'),
-    ('stage', 'stage', 'The whole suite, with a result for every scenario in the set, by a fresh agent', 'QA\'s report: the commit tested, each command with its result, and the result for each scenario'),
+    ('dev', 'development', 'Nothing is run. The features are merged', 'A conflict between features shows, and is resolved by a merge branch'),
+    ('stage', 'The suite\'s run', 'The whole suite, once, on the named commit of stage', 'The commit, and each command with its result'),
+    ('stage', 'QA', 'Each scenario the release names, read against its tests and checked by hand where they fall short, by a fresh agent', 'QA\'s report: the commit checked, the result for each scenario, and what was checked by hand'),
     ('main', 'Promotion', 'The maintainer\'s acceptance', 'The promotion of stage to main, and the release\'s two tags'),
 ]
 
@@ -675,20 +732,21 @@ def addup():
     rows = ''.join(f'<tr class="c-{c}"><td><b>{esc(a)}</b></td><td>{esc(b)}</td><td>{esc(w)}</td></tr>' for c, a, b, w in STATIONS)
     return (f'<ul class="gives two">{cards(ADDUP)}</ul>'
             '<h3 class="sub">Fixed places to test</h3>'
-            '<p class="note">The road has stations. Each has its check and what comes of it, so nobody has to invent where testing happens.</p>'
+            '<p class="note">The road has stations. Each has its check and what comes of it, so nobody has to invent where testing happens. Nothing is checked twice on code that has not changed.</p>'
             '<div class="tablewrap"><table><thead><tr><th>Station</th><th>What is checked</th><th>What comes of it</th></tr></thead>'
             f'<tbody>{rows}</tbody></table></div>')
 
 
 PROBLEMS = [
-    ('One unfinished feature is blocking the release.', 'A release is assembled from chosen features. The unfinished one stays on development.'),
+    ('One unfinished feature is blocking the release.', 'A release is built from the features on its list. The unfinished one stays on development.'),
     ('We need a code freeze before every release.', 'development never freezes. The release is built on stage, apart from ongoing work.'),
     ('Merge hell on long-lived branches.', 'Features are built to be independent, and conflicts surface on development early. A conflict resolved once can be replayed by Git\'s recorded resolutions (rerere), on the machine that resolved it.'),
     ('The hotfix never made it back, and the bug returned.', 'A hotfix takes the same road, and main is merged into development straight after, which is how development gets the fix.'),
-    ('It worked in testing but not in the release.', 'What is verified on stage is what is promoted: nothing is changed on stage itself. Before that, the set is tested together as a candidate, and stage is checked against it, tree against tree.'),
+    ('It worked in testing but not in the release.', 'The whole suite is run on stage, which holds exactly what ships, and what is verified there is what is promoted: nothing is changed on stage itself.'),
+    ('We run the same tests again and again.', 'A step is taken only when what starts it has happened. A feature\'s own tests run when its code changes. Nothing is run on development. The whole suite runs once, on stage, and again only if stage changes.'),
     ('We reverted it and now the history is a mess.', 'Before promotion nothing is reverted: stage is rebuilt without the feature. A bad release already on main is put back by deploying the previous release again, then corrected by a hotfix. main is never reverted.'),
-    ('Nobody knows what is actually in this release.', 'The release set is chosen feature by feature, and the history names every branch merged and the pull request that merged it.'),
-    ('QA is a rubber stamp, or the author tested their own work.', 'QA is done by a fresh agent that has built nothing in the project, and gives a result scenario by scenario. Its brief is fixed text: the agent that starts QA sends it as written, filling in only what it leaves open.'),
+    ('Nobody knows what is actually in this release.', 'The release list is named feature by feature, and the history names every branch merged and the pull request that merged it.'),
+    ('QA is a rubber stamp, or the author tested their own work.', 'QA is done by a fresh agent that has built nothing in the project. It reads each scenario against the tests that name it, checks by hand what they miss, and gives a result scenario by scenario. Its brief is fixed text: the agent that starts QA sends it as written, filling in only what it leaves open.'),
 ]
 
 
@@ -732,13 +790,13 @@ def ai():
 
 def conflict_notes():
     return ('<p class="note"><b>A merge resolves its conflict and nothing else.</b> Any other change features need in order to work together is written on a feature\'s own branch, never in a merge and never on <code>development</code> or <code>stage</code>, and the feature is merged again. Where such a change is only right with the other features present, those features require each other, and the answer is a coordination.</p>'
-            '<p class="note"><b>A conflict GitHub reports and Git does not have.</b> A feature cut from <code>main</code> after a release holds every released feature. <code>development</code> holds the same features by another route, their own pull requests. Until the two are joined they share each released feature separately, and GitHub reports a conflict on a pull request that Git on a machine merges cleanly. The cure is the join made after every release and hotfix: <code>main</code> goes into <code>development</code> by pull request. If the merge branch has become routine, something has not been merged that should have been, and that is what to say.</p>')
+            '<p class="note"><b>A conflict GitHub reports and Git does not have.</b> A feature cut from <code>main</code> after a release holds every released feature. <code>development</code> holds the same features by another route, their own pull requests. Until the two are joined they share each released feature separately, and GitHub reports a conflict on a pull request that Git on a machine merges cleanly. The cure is to bring the two level after every release and hotfix: <code>development</code> is rebuilt from <code>main</code> after a release, and <code>main</code> goes into it by pull request after a hotfix or where it is left running. If the merge branch has become routine, something has not been merged that should have been, and that is what to say.</p>')
 
 
 # What a project on the flow has to be -------------------------------------------------
 SETUP = [
     ('<code>development</code> and <code>stage</code>, created from <code>main</code> when the project starts',
-     'Both are permanent. <code>development</code> receives features to be tried together, and <code>stage</code> receives the release set.',
+     'Both are permanent. <code>development</code> receives features to be merged, and <code>stage</code> receives the release list.',
      'git fetch origin\ngit push origin origin/main:refs/heads/development origin/main:refs/heads/stage'),
     ('Protection of <code>main</code> on GitHub',
      'Force pushes are blocked and deletion is blocked. It changes only by a pull request, from <code>stage</code>.', ''),
@@ -747,7 +805,7 @@ SETUP = [
     ('The repository\'s merge settings',
      'Merge commits only, with squash merging and rebase merging turned off, so a pull request cannot be merged any other way. A branch is not required to be up to date before merging, since that would need <code>development</code> or <code>stage</code> merged into the feature.', ''),
     ('Reuse of recorded resolutions, once per clone',
-     'A conflict resolved once is replayed when the same feature meets it again, on <code>stage</code> or after a reset.',
+     'A conflict resolved once is replayed when the same feature meets it again, on <code>stage</code> or after a reset, in the clone that recorded it.',
      'git config rerere.enabled true'),
     ('A folder for each branch an agent works on',
      'Each feature has a folder of its own, a Git worktree, so no two people or agents share a checkout.',
@@ -755,8 +813,9 @@ SETUP = [
 ]
 KEPT = [
     ('Before a branch exists', 'What is to be built, with a story and scenarios where it is new behaviour. A fix names the scenario it restores, or adds one for the fault.'),
-    ('At the feature', 'The code review: the decision, and each finding with its kind and how it ended. And how much rework the code review caused.'),
-    ('At stage', 'QA\'s report: the commit tested, each command with its result, the result for each scenario, and what could not be done.'),
+    ('At the feature', 'The test run and the commit it was run on. The code review: the decision, and each finding with its kind and how it ended, and how much rework it caused.'),
+    ('The release list', 'The features the release is to hold, as the maintainer named them, kept where the maintainer and the agents read the same list.'),
+    ('At stage', 'The suite\'s run: the commit, each command with its result, and the regression count. QA\'s report: the result for each scenario, what was checked by hand, and what could not be done.'),
     ('At promotion', 'The maintainer\'s word to promote, and the release\'s two tags on main.'),
 ]
 
@@ -766,7 +825,7 @@ def first():
     return [
         ('commits', 'What using the flow commits a project to',
          '<p class="say">Using Feature Promotion Flow commits a project to three permanent branches and one rule about where work starts: every feature is cut from <code>main</code>, and from nowhere else.</p>'
-         '<p class="note"><code>main</code> is what is released. <code>development</code> receives features, to be tried together. <code>stage</code> receives the release set the maintainer chose. All three change only by pull request, merged as real merges and never squashed.</p>'
+         '<p class="note"><code>main</code> is what is released. <code>development</code> receives features, so that they are merged in one place and any conflict between them shows; nothing is run on it. <code>stage</code> receives the release list the maintainer named. All three change only by pull request, merged as real merges and never squashed.</p>'
          '<p class="note">The branches are not environments, though in a project they may map to them. Every step is plain Git, with pull requests on GitHub, and can be done by hand.</p>'),
         ('setup', 'What is set up once',
          '<p class="say">A project is set up for the flow once, when it starts. Nothing here needs a tool beyond Git and GitHub.</p>'
@@ -784,7 +843,7 @@ def first():
 
 SOURCES = [
     ('The method', [
-        ('The development standards this guide is drawn from', '', 'The rules and the steps, as they stood on November 22, 2026. They are Lucidex Group\'s own and are not published; every rule and figure here is drawn from them.', 'source'),
+        ('The development standards this guide is drawn from', '', 'The rules and the steps, as they stood on November 24, 2026. They are Lucidex Group\'s own and are not published; every rule and figure here is drawn from them.', 'source'),
         ("gitworkflows, in Git's manual", 'https://git-scm.com/docs/gitworkflows', "The Git project's own method, and the parent of this one: topic branches that graduate through integration branches, throw-away integration, tagged releases.", 'named in the standards; read at its source'),
         ('gitworkflow, explained for other teams', 'https://github.com/rocketraman/gitworkflow', 'The same method set out for teams outside the Git project.', 'named in the standards; not opened in this check'),
         ('Branch Per Feature, Adam Dymitruk, 2012', 'https://dymitruk.com/blog/2012/02/05/branch-per-feature/', 'The closest published method: every feature starts from the same commit, and a release is assembled from the features that are ready.', 'named in the standards; not opened in this check'),
@@ -818,7 +877,7 @@ PARTS = [
     ('What a project on the flow has to be', 'For a person deciding whether to run a project this way, and anyone working in one that does.'),
     ('Why', 'For anyone deciding whether to work this way.'),
     ('The flow', 'How work moves from main to a release.'),
-    ('Releases', 'Assembling one, testing it, naming it.'),
+    ('Releases', 'Building one on stage, testing it, naming it.'),
     ('When things do not go to plan', 'Rework, failures, hotfixes, a bad release, conflicts and features that require each other.'),
     ('What not to do', 'The mistakes that cost a release later.'),
     ('Who decides what', 'What may be done without asking, and what waits for the maintainer.'),
@@ -845,16 +904,19 @@ def doc():
          'Five conversations teams are having about building software with AI, and where this method answers them.',
          ai()),
         (3, 'road', 'The road from main, and back to it',
-         'Work starts from <code>main</code> and ends on <code>main</code>. A feature is code reviewed on its own branch, merged into <code>development</code> to be tested with the others, and merged into <code>stage</code> only when it is chosen for a release.',
-         fig(road(), 'Time runs left to right. Feature A is released. Feature B is tested on <code>development</code> and waits for a later release. No feature is ever cut from <code>development</code> or <code>stage</code>, and nothing pulls from them.')),
+         'Work starts from <code>main</code> and ends on <code>main</code>. A feature is tested and code reviewed on its own branch, merged into <code>development</code> where nothing is run, and merged into <code>stage</code> only when it is on the release list.',
+         fig(road(), 'Time runs left to right. Feature A is released. Feature B is on <code>development</code> and waits for a later release. No feature is ever cut from <code>development</code> or <code>stage</code>, and nothing pulls from them.')),
         (3, 'steps', 'One feature, step by step',
          'The same road as the section before, as eight cards for one feature, ending at promotion. Two standards apply. Building to <code>development</code> is fast. Choosing for <code>stage</code> is strict, and two of its steps wait for the maintainer.',
          steps()),
+        (3, 'see', 'Seeing a feature before it is tested',
+         'A person working with an agent will want to see what has been built before it goes anywhere. That is what a developer does while working on a feature, and it is an option, not a step of the testing process.',
+         see()),
         (3, 'checks', 'The checks, in order',
          'Each word means one thing. A review is always a plan review or a code review.',
          checks()),
         (3, 'eligible', 'What makes a feature eligible for stage',
-         'Being on <code>development</code> is not enough. These six conditions are the bar for <code>stage</code>. A feature below it is chosen only by the maintainer\'s decision.',
+         'Being on <code>development</code> is not enough. These five conditions are the bar for <code>stage</code>. A feature below it is on the release list only by the maintainer\'s decision.',
          eligible()),
         (3, 'holds', 'What each branch holds',
          'A feature\'s folder always holds everything needed to build and test it: what is released, and its own code. Nothing of any other feature is in it.',
@@ -863,14 +925,17 @@ def doc():
          'One repository, checked out in several folders, so no two people or agents share a checkout.',
          folders()),
         (4, 'release', 'A release',
-         'The same road, for a set of three features. A release is assembled on <code>stage</code> from the features chosen for it, verified there, and promoted to <code>main</code> as a whole.',
-         fig(release(), 'After the release <code>main</code> goes into <code>development</code> by pull request, and each feature still in progress pulls <code>main</code>. <code>development</code> and <code>stage</code> usually stay as they are: <code>stage</code> already holds what <code>main</code> holds, and the released features are already on <code>development</code>. The pull request from <code>main</code> is what joins <code>development</code> to the release.')),
+         'The same road, for three features. A release is built on <code>stage</code> from the features on its list, the whole suite is run there once, QA checks it, and it is promoted to <code>main</code> as a whole.',
+         fig(release(), 'After the release <code>development</code> is rebuilt: reset to <code>main</code>, and feature B, still in progress, merged into it again without being tested or code reviewed again. No feature is sent back by the release. <code>stage</code> stays as it is: it already holds what <code>main</code> holds.')),
+        (4, 'rebuild', 'Rebuilding development after a release',
+         'After a release, <code>development</code> is usually reset to <code>main</code> and the features still in progress are merged into it again. By then most of what it held is released, so the reset costs little, and it keeps <code>development</code> from gathering merges that GitHub reads as conflicts.',
+         rebuild()),
         (4, 'loop', 'The whole cycle, as a loop',
          'The same release, drawn as rings. Time runs clockwise from the top, and one turn is one release. Where the linear picture ends, this one begins again.',
          '<div class="loopwrap">' + fig(loop(), 'The rings are the branches, with <code>main</code> at the centre. A feature that is released ends when it reaches <code>stage</code>. A feature that waits goes all the way round, and an ordinary release breaks no ring.') + '</div>'),
-        (4, 'candidate', 'Testing the release set before stage is built',
-         'The features tried together on <code>development</code> are everything in progress, not the release set. So the chosen set is first built as a candidate on a machine: <code>main</code> plus the set, merged in release order and never pushed, with the whole suite run on the assembled set. The same features are then merged into <code>stage</code> in the same order, and <code>stage</code> is checked against the candidate.',
-         fig(candidate(pulled='main'), 'A break is found before <code>stage</code> exists, where leaving a feature out costs nothing on GitHub. Where people need to see the candidate running, it can be built on <code>development</code> instead. That is a case of items coming out of it: <code>development</code> is reset to <code>main</code> on the maintainer\'s word and the set is merged into it, so the candidate can be seen running wherever <code>development</code> is deployed. The features left out are merged into it again afterwards.')),
+        (4, 'testing', 'The testing process',
+         'What is tested, where, and what starts it, as twelve steps. A step is taken when what starts it has happened, and not otherwise: nothing is run again on code that has not changed.',
+         testing()),
         (4, 'history', 'How the history says where work is, and how a release is named',
          'A commit does not record its branch, but a merge\'s title names the branch merged and the branch merged into, and its body names the pull request that made it. Read by first parent, each permanent branch is one line per arrival.',
          history()),
@@ -878,10 +943,10 @@ def doc():
          'A feature is code reviewed on its own branch, and its findings answered, before it is first merged into <code>development</code>, so that it is merged once. The builder classifies each finding and deals with it by its kind, and anything to fix is fixed where the feature was built.',
          fig(rework(), 'A feature that was already on <code>development</code> when it was reworked is merged into it again by pull request; <code>development</code> is not reset for it. How much rework each code review caused is said, and discussed with the user.') + findings()),
         (5, 'fails', 'When a feature fails on stage',
-         'If <code>stage</code> fails, it is not left standing. A failed feature is not backed out. Usually it comes out, and <code>stage</code> is rebuilt without it; where the fault is small and quickly fixed on the feature\'s own branch, the feature may be merged again on top. Either way <code>stage</code> is checked again.',
-         fig(fails(noted=SAID), 'Shown: the usual case. <code>stage</code> is reset to <code>main</code>, the candidate is built again from the rest of the release set, the rest is merged into <code>stage</code> again, and it is checked again. The fix is made on the feature\'s own branch and code reviewed there. A feature the maintainer did not choose never goes in.') + resets()),
+         'If <code>stage</code> fails, it is not left standing. A failed feature is not backed out. Usually it comes out, and <code>stage</code> is rebuilt without it; where the fault is small and quickly fixed on the feature\'s own branch, the feature may be merged again on top. Either way the suite is run on <code>stage</code> again.',
+         fig(fails(noted=SAID), 'Shown: the usual case. <code>stage</code> is reset to <code>main</code>, the rest of the release list is merged into it again, and the suite is run again; QA\'s results for the features that remain stand. The fix is made on the feature\'s own branch, tested, and code reviewed where it is to a defect or a risk. A feature the maintainer did not list never goes in.') + resets()),
         (5, 'comeout', 'When items need to come out of development',
-         'This is the usual reason to reset <code>development</code>; the cases are listed in the section before. After an ordinary release it usually stays as it is. Rebuilding it from a release set, to test that set as a candidate, is a case of the same thing: everything outside the set comes out, and is merged in again afterwards.',
+         'This is one reason to reset <code>development</code>; the cases are listed in the section before. After a release it is usually rebuilt, as the section on a release shows. Rebuilding it from a release list, to show that release running before <code>stage</code> is built, is a case of the same thing: everything outside the list comes out, and is merged in again afterwards.',
          fig(comeout(), 'When <code>development</code> is reset, every surviving feature is merged again, so the same conflict can come up again. Git\'s recorded resolutions replay it.')),
         (5, 'hotfix', 'A hotfix',
          'A hotfix is a fix that cannot wait for the next release. It takes a release\'s road from <code>stage</code> onward, alone. It does not pass through <code>development</code>, and it never goes straight to <code>main</code>.',
@@ -891,7 +956,7 @@ def doc():
          fig(rollback(), 'Putting production back is a deployment and changes nothing in Git. The reset of <code>stage</code> and the steps after a release are as in the hotfix above and are left out of this drawing.')),
         (5, 'conflict', 'Resolving a conflict',
          'Whoever opened the pull request resolves the conflict. Nothing is pushed to <code>development</code> or <code>stage</code> to get round one.',
-         fig(conflict(), 'The same means serves <code>stage</code>. The merge is made on a machine, so Git\'s reuse of recorded resolutions (rerere, turned on once per clone) applies: the same conflict, resolved once, is replayed when it comes up again on that machine. The recordings are kept per clone, and Git has no means of sharing them. A merge branch is for a real conflict, and it is the one branch ever cut from <code>development</code> or <code>stage</code>.') + conflict_notes()),
+         fig(conflict(), 'The same means serves <code>stage</code>. The merge is made on a machine, so Git\'s reuse of recorded resolutions (rerere, turned on once per clone) applies: the same conflict, resolved once, is replayed when it comes up again on that machine. The recordings are kept per clone, and Git has no means of sharing them, so a conflict resolved on <code>development</code> is replayed on <code>stage</code> only from the same clone; from another, it is resolved again. <code>stage</code> is the first place the release\'s features are together without the rest, so a conflict between them may first show there. A merge branch is for a real conflict, and it is the one branch ever cut from <code>development</code> or <code>stage</code>.') + conflict_notes()),
         (5, 'coordination', 'Features that require each other',
          'Sometimes one feature cannot be built or tested without another that is not yet released, or features work together only with a change that is right only with the others present. One answer is to wait for the first to be released. The other is a coordination, which lets them be worked on together while each stays on its own branch. Which is the maintainer\'s to decide.',
          fig(coordination(), 'A member\'s passing result was earned with the other members present, so it goes into <code>development</code> or <code>stage</code> only with, or after, the members it requires.') + mergeonly()),
@@ -906,7 +971,7 @@ def doc():
          + fig(p_squash(), 'Every merge is a real merge, and its title names both branches. That is how the history says where work has been.')
          + fig(p_rebase(), 'A feature that has been merged anywhere is never rebased.')
          + fig(p_hotfix(), 'What is verified on <code>stage</code> is what ships. A hotfix is no exception.')
-         + fig(p_backout(), 'Nothing is patched on <code>stage</code>. Usually it is reset, and the rest of the set is merged again.')
+         + fig(p_backout(), 'Nothing is patched on <code>stage</code>. Usually it is reset, and the rest of the release list is merged again.')
          + rules()),
         (7, 'who', 'Who may do what without asking',
          'Work on a feature is free. Anything that changes what is released waits for the maintainer.',
@@ -916,7 +981,7 @@ def doc():
         'name': 'Feature Promotion Flow',
         'title': 'Feature Promotion Flow',
         'lede': 'How work moves from a feature to a release under Feature Promotion Flow: the branches, the checks, a release, and what to do when things do not go to plan. This is the flow on its own. The other tab adds what changes in a project that keeps its record with Docket.',
-        'intro': 'Feature Promotion Flow is a way of branching and releasing. Every feature lives on its own branch, cut from <code>main</code>. Features are merged into <code>development</code> to be tested together. A release is assembled on <code>stage</code> from the features chosen for it, verified, and promoted to <code>main</code>. Being on <code>development</code> says nothing about release: the release set is chosen, feature by feature.',
+        'intro': 'Feature Promotion Flow is a way of branching and releasing. Every feature lives on its own branch, cut from <code>main</code>. Features are merged into <code>development</code>, where their conflicts show. A release is built on <code>stage</code> from the features the maintainer lists for it, tested and checked there, and promoted to <code>main</code>. Being on <code>development</code> says nothing about release: the release list is named, feature by feature.',
         'parts': PARTS,
         'first': [{'id': i, 'title': t, 'html': f'<section id="{i}"><header><h2>{t}</h2></header>{b}</section>'} for i, t, b in first()],
         'repo': ('https://github.com/Lucidex-Group/feature-promotion-flow', 'github.com/Lucidex-Group/feature-promotion-flow', 'This guide, its source, and the skills for the flow.'),
@@ -925,5 +990,5 @@ def doc():
         'sections': S,
         'sources': sources(),
         'sources_desc': 'Where the method comes from, and where each claim about other teams comes from, with how far each was checked.',
-        'footer': 'Drawn from Lucidex Group\'s development standards, November 22, 2026. Branch names are the standard ones.',
+        'footer': 'Drawn from Lucidex Group\'s development standards, November 24, 2026. Branch names are the standard ones.',
     }

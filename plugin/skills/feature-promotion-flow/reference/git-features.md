@@ -6,9 +6,9 @@
 | Real merges | `git merge --no-ff`, and merge commits only on the Git host | Every merge of a feature, and the promotion of `stage`. The merge's title is how the history says where work has been. |
 | Annotated tags | `git tag -a` | The release, on `main`: two tags on the same commit. |
 | Safe overwriting | `git push --force-with-lease` | Resetting `development` or `stage` on the remote. Never a plain force. |
-| Try a merge without doing it | `git merge-tree --write-tree <branch> <branch>` | A quick check that a release set merges, without building anything. Building a candidate and running it shows more. |
+| Try a merge without doing it | `git merge-tree --write-tree <branch> <branch>` | A quick check that a release list merges, without building anything. Nothing in the steps depends on it. |
 | First-parent history | `git log --first-parent main` | Reading `main` as one line per release. |
-| A worktree per branch | `git worktree add`, with `git config worktree.useRelativePaths true` | A folder for each feature, so no two agents share a checkout, and a folder for the candidate. Relative paths need Git 2.48 or later. |
+| A worktree per branch | `git worktree add`, with `git config worktree.useRelativePaths true` | A folder for each feature, so no two agents share a checkout. Relative paths need Git 2.48 or later. |
 | Commit trailers | A line such as `Pull-request: <URL>` at the end of a message | The one line in the body of every merge made by pull request, so that the merge commit leads to its pull request. |
 
 ## Cautions
